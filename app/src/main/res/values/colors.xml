@@ -5,6 +5,7 @@
 
     <color name="light_black">#1b1b1b</color>
     <color name="custom_black">#151515</color>
+    <color name="custom_black2">#1C1C1C</color>
     <color name="custom_red">#de614b</color>
     <color name="custom_gray">#6a6a6a</color>
 </resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/custom_black">
+
+        <ImageView
+            android:id="@+id/tutorialPage2HttpIcon"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="35dp"
+            android:src="@drawable/mobile_browser_icon" />
+
+        <TextView
+            android:id="@+id/tutorialPage2Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tutorialPage2HttpIcon"
+            android:layout_alignStart="@+id/tutorialPage2HttpIcon"
+            android:layout_alignEnd="@+id/tutorialPage2HttpIcon"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="0dp"
+            android:text="@string/lorem_ipsum_5word"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/tutorialPage2Paragraph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tutorialPage2Title"
+            android:layout_alignStart="@+id/tutorialPage2HttpIcon"
+            android:layout_alignEnd="@+id/tutorialPage2HttpIcon"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="0dp"
+            android:text="@string/lorem_ipsum_10word"
+            android:textAlignment="center"
+            android:textColor="@color/custom_gray"
+            android:textSize="18dp" />
+
+
+        <Button
+            android:id="@+id/nextPageTutorial2"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="0dp"
+            app:backgroundTint="@color/custom_red"
+            android:layout_below="@+id/tutorialPage2Paragraph"
+            android:layout_alignStart="@+id/tutorialPage2Paragraph"
+            android:layout_alignEnd="@+id/tutorialPage2Paragraph"
+            app:cornerRadius="10dp"
+            app:strokeColor="#FFFFFF"
+            android:textColor="@color/white"
+            android:text="Lets Go!"/>
+
+</RelativeLayout>

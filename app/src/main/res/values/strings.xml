@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">HostMobile</string>
+
+    <string name="lorem_ipsum_10word">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam porta.</string>
+    <string name="lorem_ipsum_5word">Lorem ipsum dolor sit amet.</string>
+    <string name="lorem_ipsum_1paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae egestas odio. Nulla odio orci, dapibus id urna a, mattis varius diam. Morbi lobortis vehicula hendrerit. Cras in aliquam est. Quisque non massa sodales, scelerisque turpis vel, efficitur diam. Sed non tristique lectus, a commodo arcu. Morbi mollis tincidunt sem id pharetra.</string>
+
 </resources>

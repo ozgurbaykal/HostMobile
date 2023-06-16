@@ -1,15 +1,20 @@
 package com.ozgurbaykal.hostmobile.view
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.ozgurbaykal.hostmobile.R
+import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
+import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 
 class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
@@ -22,6 +27,9 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
     private lateinit var advancedSettingsButton : RelativeLayout
     private lateinit var dropDownLinear : LinearLayout
 
+    private lateinit var localIpEditText : EditText
+    private lateinit var customServerPortEditText : EditText
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,6 +41,23 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         advancedSettingsButton = binding.advancedSettingsRelativeLayoutButton
         dropDownLinear = binding.dropDownLinear
+
+        localIpEditText = binding.customServerLocalIpEditText
+        customServerPortEditText = binding.customServerPortEditText
+
+        customServerPortEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                CustomServerController().customServerPort = customServerPortEditText.text.toString().toInt()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
+        localIpEditText.setText(CustomLocalAddress.getIpAddress(requireContext()))
 
         advancedSettingsButton.setOnClickListener {
             Log.i(TAG, " Advanced Settings Clicked")

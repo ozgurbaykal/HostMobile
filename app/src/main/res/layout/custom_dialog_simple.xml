@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_bg_with_color"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingStart="50dp"
+    android:paddingEnd="50dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
+
+
+    <TextView
+        android:id="@+id/simpleDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/lorem_ipsum_5word"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textColor="@color/white"
+        android:layout_marginBottom="20dp"/>
+
+    <ImageView
+        android:id="@+id/simpleDialogImage"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/http_icon"/>
+
+    <TextView
+        android:id="@+id/simpleDialogParagraph"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/lorem_ipsum_1paragraph"
+        android:textAlignment="center"/>
+
+    <Button
+        android:id="@+id/simpleDialogClickButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="15dp"
+        android:text="Button Text"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/custom_blue"
+        app:cornerRadius="10dp"
+        app:strokeColor="#FFFFFF" />
+
+</LinearLayout>

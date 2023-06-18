@@ -27,6 +27,8 @@ import androidx.fragment.app.commit
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
 import com.ozgurbaykal.hostmobile.service.CustomHttpService
 import com.ozgurbaykal.hostmobile.service.DefaultHttpService
+import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
+import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "_MainActivity"
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         openServerButton.setOnClickListener {
             Log.i(TAG, "openServerButton clicked")
 
+            //SUNUCU SERVİSİ BAŞLATMA
             val intent = Intent(this, CustomHttpService::class.java)
             ContextCompat.startForegroundService(this@MainActivity, intent)
 

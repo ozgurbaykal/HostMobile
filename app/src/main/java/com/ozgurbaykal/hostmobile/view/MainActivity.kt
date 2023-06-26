@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.net.wifi.WifiManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -25,8 +26,10 @@ import com.ozgurbaykal.hostmobile.databinding.ActivityMainBinding
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
+import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.service.CustomHttpService
 import com.ozgurbaykal.hostmobile.service.DefaultHttpService
+import com.ozgurbaykal.hostmobile.service.NetworkUtils
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 
@@ -46,19 +49,64 @@ class MainActivity : AppCompatActivity() {
 
         openServerButton = binding.openServerButton
 
-        openServerButton.setOnClickListener {
-            Log.i(TAG, "openServerButton clicked")
-
-            //SUNUCU SERVİSİ BAŞLATMA
-            val intent = Intent(this, CustomHttpService::class.java)
-            ContextCompat.startForegroundService(this@MainActivity, intent)
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel("CHANNEL_SERVICE", "Foreground Service Channel",
                     NotificationManager.IMPORTANCE_LOW)
                 val manager = getSystemService(NotificationManager::class.java)
                 manager.createNotificationChannel(channel)
             }
+
+        openServerButton.setOnClickListener {
+
+            val defaultHttpIntent = Intent(this, DefaultHttpService::class.java)
+            ContextCompat.startForegroundService(this@MainActivity, defaultHttpIntent)
+
+            val customHttpIntent = Intent(this, CustomHttpService::class.java)
+
+            if(openServerButton.tag.equals("CLOSE")){
+
+
+                Log.i(TAG, "openServerButton clicked customServerPort: " + CustomServerController.customServerPort)
+
+                if(CustomServerController.customServerPort == 0){
+                    val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Empty Fields","Custom Server Port field is empty. Please enter the port value and try again.", R.drawable.empty)
+                    customDialogManager.setSimpleDialogButtonText("Confirm")
+
+                    customDialogManager.showCustomDialog()
+                }else{
+
+                    if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
+                        Log.e(TAG, "CustomServerPort is already used")
+
+                        val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Port Conflict","The selected custom server ${CustomServerController.customServerPort} port is currently in use by another application. Please select a different port and try again.", R.drawable.conflict)
+                        customDialogManager.setSimpleDialogButtonText("Confirm")
+
+                        customDialogManager.showCustomDialog()
+
+                        return@setOnClickListener
+                    }
+
+                    //CUSTOM SUNUCU SERVİSİ BAŞLATMA
+                    ContextCompat.startForegroundService(this@MainActivity, customHttpIntent)
+
+                    openServerButton.text = "Server(s) Running  -  STOP"
+                    val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_blue))
+                    openServerButton.backgroundTintList = colorStateList
+                    openServerButton.tag = "OPEN"
+                }
+
+            }else{
+                stopService(customHttpIntent)
+                stopService(defaultHttpIntent)
+
+                openServerButton.text = "OPEN SERVER(S) LETS GOOOOOOO!"
+                val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_red))
+                openServerButton.backgroundTintList = colorStateList
+                openServerButton.tag = "CLOSE"
+            }
+
+
+
         }
 
         SharedPreferenceManager.init(this@MainActivity)

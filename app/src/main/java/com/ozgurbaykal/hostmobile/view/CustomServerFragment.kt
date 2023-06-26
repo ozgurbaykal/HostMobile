@@ -36,6 +36,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         savedInstanceState: Bundle?
     ): View? {
 
+        val controller = CustomServerController
+
         _binding = FragmentCustomServerBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -47,7 +49,9 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         customServerPortEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                CustomServerController().customServerPort = customServerPortEditText.text.toString().toInt()
+                val portNumber = customServerPortEditText.text.toString().toIntOrNull() ?: 0
+                controller.customServerPort = portNumber
+                Log.i(TAG, "After set customServerPort: " + controller.customServerPort)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

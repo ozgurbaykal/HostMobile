@@ -1,7 +1,7 @@
 package com.ozgurbaykal.hostmobile.control
 
-class CustomServerController {
+object CustomServerController {
 
-    var customServerPort: Int = 8080
+    var customServerPort: Int = 0
 
 }

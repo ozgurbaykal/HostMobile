@@ -56,11 +56,12 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="8080"
+                android:hint="49761"
                 android:paddingBottom="20dp"
                 android:paddingStart="0dp"
                 android:inputType="number"
                 android:maxLength="4"
+                android:enabled="false"
                 android:backgroundTint="@color/custom_edit_text_simple"/>
 
         </LinearLayout>

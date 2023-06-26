@@ -20,6 +20,7 @@
         android:textColor="@color/white"
         app:backgroundTint="@color/custom_red"
         app:cornerRadius="10dp"
+        android:tag="CLOSE"
         app:strokeColor="#FFFFFF" />
 
     <androidx.fragment.app.FragmentContainerView

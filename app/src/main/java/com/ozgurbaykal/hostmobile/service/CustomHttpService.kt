@@ -1,7 +1,9 @@
 package com.ozgurbaykal.hostmobile.service
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
@@ -30,7 +32,7 @@ class CustomHttpService : Service() {
         super.onCreate()
     }
 
-    private val server = embeddedServer(Netty, port = CustomServerController().customServerPort,"0.0.0.0") {
+    private val server = embeddedServer(Netty, port = CustomServerController.customServerPort,"0.0.0.0") {
         routing {
             get("/") {
                 call.respondText("Hello, world! CustomHttpService")
@@ -41,13 +43,17 @@ class CustomHttpService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         server.start(wait = false)
-        Log.i(TAG, "onStartCommand() -> ")
+        Log.i(TAG, "onStartCommand() -> PORT: " + CustomServerController.customServerPort)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         server.stop(1000, 5000)
         Log.i(TAG, "onDestroy() ->")
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(1)
+
         super.onDestroy()
     }
 
@@ -58,8 +64,8 @@ class CustomHttpService : Service() {
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSmallIcon(R.drawable.custom_edit_server_icon)
-            .setContentTitle("Server Running!")
-            .setContentText("Your mobile server service is active and running.")
+            .setContentTitle("Custom Server Running!")
+            .setContentText("Your custom mobile server service is active and running on " + CustomServerController.customServerPort + " port")
             .build()
 
         startForeground(1, notification)

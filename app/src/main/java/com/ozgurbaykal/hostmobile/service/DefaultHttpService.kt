@@ -1,12 +1,15 @@
 package com.ozgurbaykal.hostmobile.service
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.ozgurbaykal.hostmobile.R
+import com.ozgurbaykal.hostmobile.control.CustomServerController
 import io.ktor.server.application.call
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -29,7 +32,7 @@ class DefaultHttpService : Service() {
         super.onCreate()
     }
 
-    private val server = embeddedServer(Netty, port = 8080,"0.0.0.0") {
+    private val server = embeddedServer(Netty, port = 49761,"0.0.0.0") {
         routing {
             get("/") {
                 call.respondText("Hello, world!")
@@ -46,6 +49,10 @@ class DefaultHttpService : Service() {
 
     override fun onDestroy() {
         server.stop(1000, 5000)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(2)
+
         Log.i(TAG, "onDestroy() ->")
         super.onDestroy()
     }
@@ -57,11 +64,11 @@ class DefaultHttpService : Service() {
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setSmallIcon(R.drawable.custom_edit_server_icon)
-            .setContentTitle("Server Running!")
-            .setContentText("Your mobile server service is active and running.")
+            .setContentTitle("Default Server Running!")
+            .setContentText("Your default mobile server service is active and running on " + 49761 + " port")
             .build()
 
-        startForeground(1, notification)
+        startForeground(2, notification)
     }
 
 }

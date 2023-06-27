@@ -15,7 +15,10 @@ import androidx.fragment.app.Fragment
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
 import com.ozgurbaykal.hostmobile.control.CustomServerController
+import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
+import com.ozgurbaykal.hostmobile.service.CustomHttpService
+import com.ozgurbaykal.hostmobile.service.ServiceUtils
 
 class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
@@ -46,6 +49,11 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         localIpEditText = binding.customServerLocalIpEditText
         customServerPortEditText = binding.customServerPortEditText
+
+        if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
+
+            customServerPortEditText.setText(SharedPreferenceManager.readInteger("customServerPort", -1).toString())
+        }
 
         customServerPortEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

@@ -31,6 +31,16 @@ object SharedPreferenceManager {
         return sharedPreferences?.getBoolean(key, default)
     }
 
+    fun writeInteger(key: String, value: Int) {
+        val editor = sharedPreferences?.edit()
+        editor?.putInt(key, value)
+        editor?.apply()
+    }
+
+    fun readInteger(key: String, default: Int): Int? {
+        return sharedPreferences?.getInt(key, default)
+    }
+
     fun remove(key: String) {
         val editor = sharedPreferences?.edit()
         editor?.remove(key)

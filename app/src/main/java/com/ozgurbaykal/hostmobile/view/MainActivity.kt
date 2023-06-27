@@ -17,6 +17,7 @@ import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -30,6 +31,7 @@ import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.service.CustomHttpService
 import com.ozgurbaykal.hostmobile.service.DefaultHttpService
 import com.ozgurbaykal.hostmobile.service.NetworkUtils
+import com.ozgurbaykal.hostmobile.service.ServiceUtils
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 
@@ -56,15 +58,23 @@ class MainActivity : AppCompatActivity() {
                 manager.createNotificationChannel(channel)
             }
 
+            val isCustomServerRunning = ServiceUtils.isServiceRunning(this, CustomHttpService::class.java)
+
+            Log.i(TAG, " isCustomServerActive: $isCustomServerRunning")
+
+            if(isCustomServerRunning){
+                openServerButton.tag = "OPEN"
+                openServerButton.text = "Server(s) Running  -  STOP"
+                val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_blue))
+                openServerButton.backgroundTintList = colorStateList
+            }
+
         openServerButton.setOnClickListener {
 
-            val defaultHttpIntent = Intent(this, DefaultHttpService::class.java)
-            ContextCompat.startForegroundService(this@MainActivity, defaultHttpIntent)
-
+            var defaultHttpIntent = Intent(this, DefaultHttpService::class.java)
             val customHttpIntent = Intent(this, CustomHttpService::class.java)
 
             if(openServerButton.tag.equals("CLOSE")){
-
 
                 Log.i(TAG, "openServerButton clicked customServerPort: " + CustomServerController.customServerPort)
 
@@ -73,6 +83,8 @@ class MainActivity : AppCompatActivity() {
                     customDialogManager.setSimpleDialogButtonText("Confirm")
 
                     customDialogManager.showCustomDialog()
+
+                    return@setOnClickListener
                 }else{
 
                     if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
@@ -86,6 +98,9 @@ class MainActivity : AppCompatActivity() {
                         return@setOnClickListener
                     }
 
+                    //DEFAULT SUNUCU SERVİSİ BAŞLATMA
+                    ContextCompat.startForegroundService(this@MainActivity, defaultHttpIntent)
+
                     //CUSTOM SUNUCU SERVİSİ BAŞLATMA
                     ContextCompat.startForegroundService(this@MainActivity, customHttpIntent)
 
@@ -93,6 +108,9 @@ class MainActivity : AppCompatActivity() {
                     val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_blue))
                     openServerButton.backgroundTintList = colorStateList
                     openServerButton.tag = "OPEN"
+
+                    SharedPreferenceManager.writeInteger("customServerPort", CustomServerController.customServerPort)
+
                 }
 
             }else{

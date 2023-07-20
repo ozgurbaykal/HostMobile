@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -19,7 +18,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.room.Room
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
@@ -27,7 +25,6 @@ import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.ActivityMainBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
-import com.ozgurbaykal.hostmobile.model.CustomServerFolders
 import com.ozgurbaykal.hostmobile.service.CustomHttpService
 import com.ozgurbaykal.hostmobile.service.DefaultHttpService
 import com.ozgurbaykal.hostmobile.service.NetworkUtils
@@ -190,8 +187,22 @@ class MainActivity : AppCompatActivity() {
             }
 
 
+            instance = this
+
         }
 
+    companion object {
+        private var instance: MainActivity? = null
+
+        fun getInstance(): MainActivity? {
+            return instance
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        instance = null
+    }
     private fun createCustomServerFilesDirectory(path: String) {
 
         val folder = File(Environment.getExternalStorageDirectory().toString() + "/CustomServerFilesHostMobile")

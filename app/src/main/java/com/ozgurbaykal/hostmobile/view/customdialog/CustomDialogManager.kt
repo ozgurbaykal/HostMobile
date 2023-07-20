@@ -120,6 +120,7 @@ class CustomDialogManager constructor(private val context: Context, private val 
 
     //SHOW DIALOGS WITHOUT LISTENERS
     fun showCustomDialog(){
+
         val builder = AlertDialog.Builder(context)
 
         val inflater = LayoutInflater.from(context)

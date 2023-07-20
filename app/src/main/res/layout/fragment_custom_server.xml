@@ -106,32 +106,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_below="@+id/textView1"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:layout_below="@+id/textView1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
-                    android:textColor="@color/custom_gray"
-                    android:textSize="19sp" />
+                <LinearLayout
+                    android:id="@+id/uploadFileLinear"
+                    android:layout_margin="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="50dp"
+                    android:background="@drawable/custom_border_gray">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
-                    android:textColor="@color/custom_gray"
-                    android:textSize="19sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Upload File"
+                        android:textColor="@color/white"
+                        android:textSize="19dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
-                    android:textColor="@color/custom_gray"
-                    android:textSize="19sp" />
+                </LinearLayout>
 
             </LinearLayout>
 

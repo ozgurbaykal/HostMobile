@@ -191,6 +191,11 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    override fun onResume() {
+        super.onResume()
+        Log.i(TAG, "-> onResume()")
+    }
+
     companion object {
         private var instance: MainActivity? = null
 

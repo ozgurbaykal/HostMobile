@@ -19,21 +19,26 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CopyFolderManagerCustomServer
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
 import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
+import com.ozgurbaykal.hostmobile.model.AppDatabase
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
@@ -44,8 +49,6 @@ import java.io.IOException
 class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private val TAG = "_CustomServerFragment"
-
-    private val requestCodeForOpenDocumentTree = 10
 
     private var _binding: FragmentCustomServerBinding? = null
     private val binding get() = _binding!!
@@ -60,6 +63,11 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private lateinit var progressBarToCopyFolder : ProgressBar
     private lateinit var copyProgressLinear : LinearLayout
+
+    private lateinit var currentFolderName : TextView
+    private lateinit var currentFileName : TextView
+
+    private lateinit var folderViewModel: FolderViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,6 +89,9 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         progressBarToCopyFolder = binding.copyFolderProgressBar
         copyProgressLinear = binding.copyProgressLinear
+
+        currentFolderName = binding.currentFolderName
+        currentFileName = binding.currentFileName
 
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
 
@@ -122,8 +133,28 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
                 dropDownLinear.visibility = View.VISIBLE
         }
 
+
+        folderViewModel = ViewModelProvider(this).get(FolderViewModel::class.java)
+
         return view
     }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        folderViewModel.selectedFolder.observe(viewLifecycleOwner) { folder ->
+            folder?.let {
+                currentFolderName.text = it.folderName
+                if (it.selectedFile != null)
+                    currentFileName.text = it.selectedFile
+            }
+        }
+
+    }
+
+
+
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {

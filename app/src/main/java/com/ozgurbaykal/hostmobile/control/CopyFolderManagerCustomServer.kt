@@ -12,6 +12,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.model.AppDatabase
 import com.ozgurbaykal.hostmobile.model.CustomServerFolders
+import com.ozgurbaykal.hostmobile.view.CustomServerFragment
 import com.ozgurbaykal.hostmobile.view.MainActivity
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
@@ -57,11 +58,16 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
         GlobalScope.launch(Dispatchers.IO) {
             val database = AppDatabase.getDatabase(context)
             val dao = database.folderDao()
-            val customServerFolders = CustomServerFolders(id = 0, folderName = selectedFolderName)
+            val totalData = dao.getAll().size
+
+            val isSelected = totalData == 0  // if database is empty set isSelected true for selected folder
+
+            val customServerFolders = CustomServerFolders(id = 0, folderName = selectedFolderName, isSelected = isSelected)
 
             try {
                 dao.insert(customServerFolders)
 
+                Log.i(TAG, " copyFilesFromUriToAppFolder() -> insert customServerFolders")
                 MainActivity.getInstance()?.runOnUiThread {
                     /*val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, "Success!","The folder named \"$selectedFolderName\" has been successfully copied to the custom folder of the Custom Server.", R.drawable.check)
                     customDialogManager.setSimpleDialogButtonText("Confirm")

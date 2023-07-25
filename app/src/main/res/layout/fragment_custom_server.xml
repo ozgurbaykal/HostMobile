@@ -106,7 +106,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
                 android:layout_below="@+id/textView1">
 
                 <LinearLayout
@@ -122,12 +121,102 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload File"
+                        android:text="Upload Folder"
                         android:textColor="@color/white"
                         android:textSize="19dp" />
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/copyProgressLinear"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Folder copying in progress... Please Wait"
+                        android:textColor="@color/custom_gray"
+                        android:textSize="15dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="5dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/copyFolderProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:progressDrawable="@drawable/custom_progressbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginEnd="15dp"
+                        android:max="100"/>
+                </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/folderListLinear"
+                android:layout_margin="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/custom_border_gray">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Selected folder is "
+                        android:textColor="@color/white"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/currentFolderName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NONE"
+                        android:textColor="@color/custom_red"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Selected starter page is "
+                        android:textColor="@color/white"
+                        android:textSize="15dp" />
+
+                    <TextView
+                        android:id="@+id/currentFileName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="NONE.html"
+                        android:textColor="@color/custom_red"
+                        android:textSize="15dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Click here to change"
+                    android:textColor="@color/white"
+                    android:textSize="11dp" />
+
+            </LinearLayout>
             </LinearLayout>
 
         </RelativeLayout>

@@ -49,6 +49,7 @@
         android:textColor="@color/white"
         app:backgroundTint="@color/custom_blue"
         app:cornerRadius="10dp"
+        android:singleLine="true"
         app:strokeColor="#FFFFFF" />
 
 </LinearLayout>

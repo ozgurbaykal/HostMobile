@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [CustomServerFolders::class], version = 1)
-abstract class AppDatabase : RoomDatabase(){
+@Database(entities = [CustomServerFolders::class], version = 2)
+abstract class AppDatabase : RoomDatabase() {
     abstract fun folderDao(): CustomServerFoldersDao
-
 
 
     companion object {
@@ -25,10 +26,28 @@ abstract class AppDatabase : RoomDatabase(){
                     context.applicationContext,
                     AppDatabase::class.java,
                     "host_mobile_app_database"
-                ).build()
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build()
                 INSTANCE = instance
                 return instance
             }
         }
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add 'is_selected' column to 'CustomServerFolders' table
+                database.execSQL(
+                    "ALTER TABLE CustomServerFolders ADD COLUMN is_selected INTEGER NOT NULL DEFAULT 0"
+                )
+
+                // Add 'selected_file' column to 'CustomServerFolders' table
+                database.execSQL(
+                    "ALTER TABLE CustomServerFolders ADD COLUMN selected_file TEXT"
+                )
+            }
+        }
     }
+
+
 }

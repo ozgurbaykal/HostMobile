@@ -49,10 +49,10 @@
             android:layout_marginTop="15dp"
             android:text="No"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:textColor="@color/white"
             app:backgroundTint="@color/custom_red"
             app:cornerRadius="10dp"
+            android:singleLine="true"
             app:strokeColor="#FFFFFF" />
         <Button
             android:id="@+id/yesNoDialogYesClickButton"
@@ -62,10 +62,10 @@
             android:layout_marginTop="15dp"
             android:text="Yes"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:textColor="@color/white"
             app:backgroundTint="@color/custom_blue"
             app:cornerRadius="10dp"
+            android:singleLine="true"
             app:strokeColor="#FFFFFF" />
     </LinearLayout>
 </LinearLayout>

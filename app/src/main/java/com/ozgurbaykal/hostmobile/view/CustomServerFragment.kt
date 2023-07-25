@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -31,6 +32,9 @@ import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -54,6 +58,9 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private lateinit var uploadFileLinear : LinearLayout
 
+    private lateinit var progressBarToCopyFolder : ProgressBar
+    private lateinit var copyProgressLinear : LinearLayout
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,6 +78,9 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         localIpEditText = binding.customServerLocalIpEditText
         customServerPortEditText = binding.customServerPortEditText
+
+        progressBarToCopyFolder = binding.copyFolderProgressBar
+        copyProgressLinear = binding.copyProgressLinear
 
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
 
@@ -120,19 +130,28 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
             val treeUri: Uri? = result.data?.data
             val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-// Check for the freshest data.
             treeUri?.let { requireActivity().contentResolver.takePersistableUriPermission(it, takeFlags) }
 
             if (treeUri != null) {
                 val appSpecificExternalDir = ContextCompat.getExternalFilesDirs(requireContext(), null)[0]
-                Log.i(TAG, "appSpecificExternalDir: " + appSpecificExternalDir)
                 val fileUtils = CopyFolderManagerCustomServer(requireContext())
 
-                fileUtils.copyFilesFromUriToAppFolder(requireContext(), treeUri, appSpecificExternalDir)
-
+                CoroutineScope(Dispatchers.IO).launch {
+                    Log.i(TAG, "Start copy process call -> copyFilesFromUriToAppFolder() func")
+                    MainActivity.getInstance()?.runOnUiThread{
+                        copyProgressLinear.visibility = View.VISIBLE
+                    }
+                    fileUtils.copyFilesFromUriToAppFolder(requireContext(), treeUri, appSpecificExternalDir, progressBarToCopyFolder)
+                    MainActivity.getInstance()?.runOnUiThread{
+                        copyProgressLinear.visibility = View.GONE
+                        progressBarToCopyFolder.progress = 0
+                    }
+                    Log.i(TAG, "Finish copy process")
+                }
             }
         }
     }
+
 
 
 

@@ -18,4 +18,7 @@ interface CustomServerFoldersDao {
     fun delete(folder: CustomServerFolders)
     @Query("SELECT * FROM customserverfolders WHERE is_selected = 1 LIMIT 1")
     fun getSelectedFolderLiveData(): LiveData<CustomServerFolders?>
+
+    @Query("SELECT selected_file FROM CustomServerFolders WHERE folder_name = :folderName")
+    fun getSelectedFile(folderName: String?): String?
 }

@@ -1,14 +1,12 @@
 package com.ozgurbaykal.hostmobile.view
 
 import android.app.Activity
-import android.content.Context
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.FileUtils
-import android.provider.DocumentsContract
-import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -16,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ExpandableListView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -23,10 +22,9 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CopyFolderManagerCustomServer
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
@@ -34,16 +32,10 @@ import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
-import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
-import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
 
 
 class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
@@ -69,6 +61,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private lateinit var folderViewModel: FolderViewModel
 
+    private lateinit var folderListLinear : LinearLayout
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -93,6 +87,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         currentFolderName = binding.currentFolderName
         currentFileName = binding.currentFileName
 
+        folderListLinear = binding.folderListLinear
+
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
 
             customServerPortEditText.setText(SharedPreferenceManager.readInteger("customServerPort", -1).toString())
@@ -112,6 +108,48 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+
+        folderListLinear.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                val database = AppDatabase.getDatabase(requireContext())
+                val dao = database.folderDao()
+                val folderNames = dao.getAll().map { it.folderName }
+
+                val folderFilesMap = mutableMapOf<String?, List<String>>()
+
+                for (folderName in folderNames) {
+                    val folderDirectory = File(requireContext().getExternalFilesDir(null), folderName)
+                    if (folderDirectory.exists() && folderDirectory.isDirectory) {
+                        val files = folderDirectory.listFiles { file -> file.extension == "html" }
+                        if (files != null && files.isNotEmpty()) {
+                            folderFilesMap[folderName] = files.map { it.name }
+                        }
+                    }
+                }
+
+                MainActivity.getInstance()?.runOnUiThread {
+                    val dialog = Dialog(requireContext())
+                    dialog.setContentView(R.layout.custom_dialog_list)
+
+                    val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
+                    val adapter = ExpandableListAdapter(requireContext(), folderNames, folderFilesMap)
+                    expandableListView.setAdapter(adapter)
+
+                    expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+                        val folderName = folderNames[groupPosition]
+                        val fileName = folderFilesMap[folderName]?.get(childPosition) ?: ""
+                        // Handle the click event for the child item (if needed)
+                        true
+                    }
+                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                    dialog.show()
+                }
+            }
+        }
+
+
+
+
 
 
 
@@ -139,6 +177,13 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         return view
     }
 
+   /* fun getHtmlFiles(folderName: String?, context: Context): List<HtmlFile> {
+        val directory = context.getExternalFilesDir(folderName)
+        val files = directory?.listFiles { file ->
+            file.extension == "html"
+        }
+        return files?.map { HtmlFile(it.name, it.path) } ?: emptyList()
+    }*/
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

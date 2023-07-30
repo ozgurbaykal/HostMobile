@@ -115,14 +115,15 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
                 val dao = database.folderDao()
                 val folderNames = dao.getAll().map { it.folderName }
 
-                val folderFilesMap = mutableMapOf<String?, List<String>>()
+                val folderFilesMap = mutableMapOf<String?, List<Pair<String, String>>>() // Use Pair<String, String> to store file name and file path together
 
                 for (folderName in folderNames) {
                     val folderDirectory = File(requireContext().getExternalFilesDir(null), folderName)
                     if (folderDirectory.exists() && folderDirectory.isDirectory) {
                         val files = folderDirectory.listFiles { file -> file.extension == "html" }
                         if (files != null && files.isNotEmpty()) {
-                            folderFilesMap[folderName] = files.map { it.name }
+                            val fileNamesWithPaths = files.map { it.name to it.path } // Pair file name with file path
+                            folderFilesMap[folderName] = fileNamesWithPaths
                         }
                     }
                 }
@@ -137,8 +138,10 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
                     expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
                         val folderName = folderNames[groupPosition]
-                        val fileName = folderFilesMap[folderName]?.get(childPosition) ?: ""
-                        // Handle the click event for the child item (if needed)
+                        val (fileName, filePath) = folderFilesMap[folderName]?.get(childPosition) ?: Pair("", "") // Retrieve both file name and file path using destructuring
+                        // Handle the click event for the child item and pass both file name and file path
+                        adapter.updateChildSelectedFile(groupPosition, childPosition, fileName, filePath)
+
                         true
                     }
                     dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -146,6 +149,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
                 }
             }
         }
+
+
 
 
 

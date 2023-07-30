@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 class ExpandableListAdapter(
     private val context: Context,
     private val folderList: List<String?>,
-    private var folderFilesMap: Map<String?, List<String>> // Add this map to store child data
+    private var folderFilesMap: Map<String?, List<Pair<String, String>>> // Update the data type for folderFilesMap
 ) : BaseExpandableListAdapter() {
 
     override fun getGroup(groupPosition: Int): String? {
@@ -51,11 +51,6 @@ class ExpandableListAdapter(
         return view
     }
 
-    fun updateChildData(dataMap: Map<String?, List<String>>) {
-        folderFilesMap = dataMap // Update the map with the new data
-        notifyDataSetChanged()
-    }
-
     override fun getChildrenCount(groupPosition: Int): Int {
         val folderName = getGroup(groupPosition)
         return folderFilesMap[folderName]?.size ?: 0
@@ -81,7 +76,7 @@ class ExpandableListAdapter(
         val view = convertView ?: LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_1, parent, false)
         val childTextView = view.findViewById<TextView>(android.R.id.text1)
         val folderName = getGroup(groupPosition)
-        val fileName = getChild(groupPosition, childPosition) as String
+        val (fileName, _) = getChild(groupPosition, childPosition) as Pair<String, String> // Destructuring to get the file name from the Pair object
         childTextView.isSingleLine = true
         childTextView.setTextColor(ContextCompat.getColor(context, R.color.custom_gray))
         childTextView.text = fileName
@@ -113,6 +108,32 @@ class ExpandableListAdapter(
         return view
     }
 
+    fun updateChildSelectedFile(groupPosition: Int, childPosition: Int, newSelectedFile: String?, newSelectedFilePath: String?) {
+        val folderName = folderList[groupPosition]
+        val filesList = folderFilesMap[folderName]
+
+        if (filesList != null && childPosition >= 0 && childPosition < filesList.size) {
+            val (selectedFileName, selectedFilePath) = filesList[childPosition]
+
+            if (selectedFileName == newSelectedFile) {
+                // Eğer yeni seçilen dosya zaten mevcut dosyaysa, bu dosyayı seçili yapın.
+                GlobalScope.launch(Dispatchers.IO) {
+                    val database = AppDatabase.getDatabase(context)
+                    val dao = database.folderDao()
+                    dao.updateSelectedFile(folderName, newSelectedFile, newSelectedFilePath)
+                }
+            } else {
+                // Eğer yeni seçilen dosya farklıysa, eski seçilen dosyayı kaldırın ve yeni seçilen dosyayı seçili yapın.
+                GlobalScope.launch(Dispatchers.IO) {
+                    val database = AppDatabase.getDatabase(context)
+                    val dao = database.folderDao()
+                    dao.clearSelectedFile(folderName)
+                    dao.updateSelectedFile(folderName, newSelectedFile, newSelectedFilePath)
+                }
+            }
+            notifyDataSetChanged()
+        }
+    }
 
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {

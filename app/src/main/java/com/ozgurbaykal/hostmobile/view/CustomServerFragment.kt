@@ -32,6 +32,8 @@ import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
+import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
+import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,44 +112,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         })
 
         folderListLinear.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                val database = AppDatabase.getDatabase(requireContext())
-                val dao = database.folderDao()
-                val folderNames = dao.getAll().map { it.folderName }
 
-                val folderFilesMap = mutableMapOf<String?, List<Pair<String, String>>>() // Use Pair<String, String> to store file name and file path together
-
-                for (folderName in folderNames) {
-                    val folderDirectory = File(requireContext().getExternalFilesDir(null), folderName)
-                    if (folderDirectory.exists() && folderDirectory.isDirectory) {
-                        val files = folderDirectory.listFiles { file -> file.extension == "html" }
-                        if (files != null && files.isNotEmpty()) {
-                            val fileNamesWithPaths = files.map { it.name to it.path } // Pair file name with file path
-                            folderFilesMap[folderName] = fileNamesWithPaths
-                        }
-                    }
-                }
-
-                MainActivity.getInstance()?.runOnUiThread {
-                    val dialog = Dialog(requireContext())
-                    dialog.setContentView(R.layout.custom_dialog_list)
-
-                    val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
-                    val adapter = ExpandableListAdapter(requireContext(), folderNames, folderFilesMap)
-                    expandableListView.setAdapter(adapter)
-
-                    expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
-                        val folderName = folderNames[groupPosition]
-                        val (fileName, filePath) = folderFilesMap[folderName]?.get(childPosition) ?: Pair("", "") // Retrieve both file name and file path using destructuring
-                        // Handle the click event for the child item and pass both file name and file path
-                        adapter.updateChildSelectedFile(groupPosition, childPosition, fileName, filePath)
-
-                        true
-                    }
-                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                    dialog.show()
-                }
-            }
+            openFolderAndFileListDialog()
         }
 
 
@@ -203,8 +169,58 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     }
 
+    private fun openFolderAndFileListDialog(){
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val database = AppDatabase.getDatabase(requireContext())
+            val dao = database.folderDao()
+            val folderNames = dao.getAll().map { it.folderName }
+
+            if(folderNames.isEmpty()){
+                MainActivity.getInstance()?.runOnUiThread {
+                    val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No folders found. Please upload a folder and try again.", R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText("Confirm")
+
+                    customDialogManager.showCustomDialog()
+                }
+            }else{
+
+                val folderFilesMap = mutableMapOf<String?, List<Pair<String, String>>>() // Use Pair<String, String> to store file name and file path together
+
+                for (folderName in folderNames) {
+                    val folderDirectory = File(requireContext().getExternalFilesDir(null), folderName)
+                    if (folderDirectory.exists() && folderDirectory.isDirectory) {
+                        val files = folderDirectory.listFiles { file -> file.extension == "html" }
+                        if (files != null && files.isNotEmpty()) {
+                            val fileNamesWithPaths = files.map { it.name to it.path } // Pair file name with file path
+                            folderFilesMap[folderName] = fileNamesWithPaths
+                        }
+                    }
+                }
+
+                MainActivity.getInstance()?.runOnUiThread {
+                    val dialog = Dialog(requireContext())
+                    dialog.setContentView(R.layout.custom_dialog_list)
+
+                    val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
+                    val adapter = ExpandableListAdapter(requireContext(), folderNames, folderFilesMap)
+                    expandableListView.setAdapter(adapter)
 
 
+                    expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+                        val folderName = folderNames[groupPosition]
+                        val (fileName, filePath) = folderFilesMap[folderName]?.get(childPosition) ?: Pair("", "") // Retrieve both file name and file path using destructuring
+                        // Handle the click event for the child item and pass both file name and file path
+                        adapter.updateChildSelectedFile(groupPosition, childPosition, fileName, filePath)
+                        adapter.notifyDataSetChanged()
+                        true
+                    }
+                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                    dialog.show()
+                }
+            }
+
+        }
+    }
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {

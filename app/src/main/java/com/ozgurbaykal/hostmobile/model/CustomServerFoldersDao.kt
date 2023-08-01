@@ -23,10 +23,10 @@ interface CustomServerFoldersDao {
     fun getSelectedFile(folderName: String?): String?
 
     @Query("UPDATE customserverfolders SET selected_file = NULL WHERE folder_name = :folderName")
-    suspend fun clearSelectedFile(folderName: String?)
+     fun clearSelectedFile(folderName: String?)
 
     @Query("UPDATE customserverfolders SET selected_file = :selectedFile, selected_file_path = :selectedFilePath WHERE folder_name = :folderName")
-    suspend fun updateSelectedFile(folderName: String?, selectedFile: String?, selectedFilePath: String?)
+     fun updateSelectedFile(folderName: String?, selectedFile: String?, selectedFilePath: String?)
 
     @Query("UPDATE CustomServerFolders SET is_selected = :isSelected WHERE folder_name = :folderName")
     fun updateSelectedFolder(isSelected: Boolean, folderName: String?)
@@ -39,4 +39,8 @@ interface CustomServerFoldersDao {
 
     @Query("SELECT selected_file_path FROM CustomServerFolders WHERE folder_name = :folderName")
     fun getSelectedFilePath(folderName: String?): String?
+
+    @Query("SELECT * FROM CustomServerFolders WHERE is_selected = :isSelected LIMIT 1")
+    fun getSelectedFolder(isSelected: Boolean = true): CustomServerFolders?
+
 }

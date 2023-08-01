@@ -1,18 +1,24 @@
 package com.ozgurbaykal.hostmobile.control
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.util.Log
+import android.widget.ExpandableListView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.model.AppDatabase
 import com.ozgurbaykal.hostmobile.model.CustomServerFolders
 import com.ozgurbaykal.hostmobile.view.CustomServerFragment
+import com.ozgurbaykal.hostmobile.view.ExpandableListAdapter
 import com.ozgurbaykal.hostmobile.view.MainActivity
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
@@ -83,6 +89,7 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
                         },    onYesButtonClick = {
                             Log.i(TAG, "customDialogManager() -> onYesButtonClick")
                             customDialogManager.cancelCustomDialog()
+                            openFolderAndFileListDialog()
                         },    onNoButtonClick = {
                             Log.i(TAG, "customDialogManager() -> onNoButtonClick")
                             customDialogManager.cancelCustomDialog()
@@ -104,6 +111,58 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
         }
     }
 
+    fun openFolderAndFileListDialog(){
+        GlobalScope.launch(Dispatchers.IO) {
+            val database = AppDatabase.getDatabase(context)
+            val dao = database.folderDao()
+            val folderNames = dao.getAll().map { it.folderName }
+
+            if(folderNames.isEmpty()){
+                MainActivity.getInstance()?.runOnUiThread {
+                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No folders found. Please upload a folder and try again.", R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText("Confirm")
+
+                    customDialogManager.showCustomDialog()
+                }
+            }else{
+
+                val folderFilesMap = mutableMapOf<String?, List<Pair<String, String>>>() // Use Pair<String, String> to store file name and file path together
+
+                for (folderName in folderNames) {
+                    val folderDirectory = File(context.getExternalFilesDir(null), folderName)
+                    if (folderDirectory.exists() && folderDirectory.isDirectory) {
+                        val files = folderDirectory.listFiles { file -> file.extension == "html" }
+                        if (files != null && files.isNotEmpty()) {
+                            val fileNamesWithPaths = files.map { it.name to it.path } // Pair file name with file path
+                            folderFilesMap[folderName] = fileNamesWithPaths
+                        }
+                    }
+                }
+
+                MainActivity.getInstance()?.runOnUiThread {
+                    val dialog = Dialog(context)
+                    dialog.setContentView(R.layout.custom_dialog_list)
+
+                    val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
+                    val adapter = ExpandableListAdapter(context, folderNames, folderFilesMap)
+                    expandableListView.setAdapter(adapter)
+
+
+                    expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+                        val folderName = folderNames[groupPosition]
+                        val (fileName, filePath) = folderFilesMap[folderName]?.get(childPosition) ?: Pair("", "") // Retrieve both file name and file path using destructuring
+                        // Handle the click event for the child item and pass both file name and file path
+                        adapter.updateChildSelectedFile(groupPosition, childPosition, fileName, filePath)
+
+                        true
+                    }
+                    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                    dialog.show()
+                }
+            }
+
+        }
+    }
     fun copyFileFromUriToFolder(context: Context, uri: Uri, destFolder: File) {
 
         val documentFile = DocumentFile.fromSingleUri(context, uri)

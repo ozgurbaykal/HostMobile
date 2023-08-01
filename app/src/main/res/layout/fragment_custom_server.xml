@@ -106,6 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:layout_below="@+id/textView1">
 
                 <LinearLayout
@@ -184,6 +185,7 @@
                         android:layout_height="wrap_content"
                         android:text="NONE"
                         android:textColor="@color/custom_red"
+                        android:singleLine="true"
                         android:textSize="15dp" />
                 </LinearLayout>
 
@@ -205,6 +207,7 @@
                         android:layout_height="wrap_content"
                         android:text="NONE.html"
                         android:textColor="@color/custom_red"
+                        android:singleLine="true"
                         android:textSize="15dp" />
                 </LinearLayout>
 

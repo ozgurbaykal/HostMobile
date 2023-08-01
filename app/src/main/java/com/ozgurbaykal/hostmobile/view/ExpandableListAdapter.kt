@@ -121,6 +121,8 @@ class ExpandableListAdapter(
                     val database = AppDatabase.getDatabase(context)
                     val dao = database.folderDao()
                     dao.updateSelectedFile(folderName, newSelectedFile, newSelectedFilePath)
+                    dao.updateSelectedFolder(true, folderName)
+                    dao.updateOtherFolders(false, folderName)
                 }
             } else {
                 // Eğer yeni seçilen dosya farklıysa, eski seçilen dosyayı kaldırın ve yeni seçilen dosyayı seçili yapın.
@@ -129,6 +131,8 @@ class ExpandableListAdapter(
                     val dao = database.folderDao()
                     dao.clearSelectedFile(folderName)
                     dao.updateSelectedFile(folderName, newSelectedFile, newSelectedFilePath)
+                    dao.updateSelectedFolder(true, folderName)
+                    dao.updateOtherFolders(false, folderName)
                 }
             }
             notifyDataSetChanged()

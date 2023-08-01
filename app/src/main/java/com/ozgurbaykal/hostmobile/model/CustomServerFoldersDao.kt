@@ -28,6 +28,11 @@ interface CustomServerFoldersDao {
     @Query("UPDATE customserverfolders SET selected_file = :selectedFile, selected_file_path = :selectedFilePath WHERE folder_name = :folderName")
     suspend fun updateSelectedFile(folderName: String?, selectedFile: String?, selectedFilePath: String?)
 
+    @Query("UPDATE CustomServerFolders SET is_selected = :isSelected WHERE folder_name = :folderName")
+    fun updateSelectedFolder(isSelected: Boolean, folderName: String?)
+
+    @Query("UPDATE CustomServerFolders SET is_selected = :isSelected WHERE folder_name != :folderName")
+    fun updateOtherFolders(isSelected: Boolean, folderName: String?)
 
     @Query("UPDATE customserverfolders SET selected_file_path = :selectedFilePath WHERE folder_name = :folderName")
     fun updateSelectedFilePath(folderName: String?, selectedFilePath: String?)

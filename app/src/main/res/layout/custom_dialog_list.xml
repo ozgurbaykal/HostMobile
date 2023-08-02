@@ -40,7 +40,7 @@
         android:scrollbars="vertical" />
 
     <Button
-        android:id="@+id/simpleDialogClickButton"
+        android:id="@+id/listDialogClickButton"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentTop="true"

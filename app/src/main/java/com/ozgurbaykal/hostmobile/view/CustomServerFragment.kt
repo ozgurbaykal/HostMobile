@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ExpandableListView
 import android.widget.LinearLayout
@@ -201,10 +202,15 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
                     val dialog = Dialog(requireContext())
                     dialog.setContentView(R.layout.custom_dialog_list)
 
+
                     val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
+                    val confirmButton = dialog.findViewById<Button>(R.id.listDialogClickButton)
                     val adapter = ExpandableListAdapter(requireContext(), folderNames, folderFilesMap)
                     expandableListView.setAdapter(adapter)
 
+                    confirmButton.setOnClickListener {
+                        dialog.cancel()
+                    }
 
                     expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
                         val folderName = folderNames[groupPosition]

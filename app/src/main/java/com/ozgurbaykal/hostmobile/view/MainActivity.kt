@@ -31,9 +31,11 @@ import com.ozgurbaykal.hostmobile.service.NetworkUtils
 import com.ozgurbaykal.hostmobile.service.ServiceUtils
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 
@@ -87,65 +89,82 @@ class MainActivity : AppCompatActivity() {
                 SharedPreferenceManager.writeInteger("customServerPort", -1)
             }
 
-        openServerButton.setOnClickListener {
+            openServerButton.setOnClickListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val database = AppDatabase.getDatabase(this@MainActivity)
+                    val dao = database.folderDao()
+                    val folderNames = dao.getAll()
+                    val selectedFolder = dao.getSelectedFolder()
 
-            var defaultHttpIntent = Intent(this, DefaultHttpService::class.java)
-            val customHttpIntent = Intent(this, CustomHttpService::class.java)
+                    withContext(Dispatchers.Main) {
+                        if (folderNames.isEmpty()) {
+                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Warning!", "No folders found. Please upload a folder and try again.", R.drawable.warning)
+                            customDialogManager.setSimpleDialogButtonText("Confirm")
+                            customDialogManager.showCustomDialog()
+                            return@withContext
+                        }else{
+                            if (selectedFolder != null) {
+                                if(selectedFolder.selectedFile == null){
+                                    val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No selected file found. Please select file in advanced settings.", R.drawable.warning)
+                                    customDialogManager.setSimpleDialogButtonText("Confirm")
 
-            if(openServerButton.tag.equals("CLOSE")){
+                                    customDialogManager.showCustomDialog()
+                                }else{
+                                    val defaultHttpIntent = Intent(this@MainActivity, DefaultHttpService::class.java)
+                                    val customHttpIntent = Intent(this@MainActivity, CustomHttpService::class.java)
 
-                Log.i(TAG, "openServerButton clicked customServerPort: " + CustomServerController.customServerPort)
+                                    if (openServerButton.tag.equals("CLOSE")) {
+                                        Log.i(TAG, "openServerButton clicked customServerPort: " + CustomServerController.customServerPort)
 
-                if(CustomServerController.customServerPort == 0){
-                    val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Empty Fields","Custom Server Port field is empty. Please enter the port value and try again.", R.drawable.empty)
-                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                                        if (CustomServerController.customServerPort == 0) {
+                                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Empty Fields", "Custom Server Port field is empty. Please enter the port value and try again.", R.drawable.empty)
+                                            customDialogManager.setSimpleDialogButtonText("Confirm")
+                                            customDialogManager.showCustomDialog()
+                                            return@withContext
+                                        } else {
+                                            if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
+                                                Log.e(TAG, "CustomServerPort is already used")
+                                                val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Port Conflict", "The selected custom server ${CustomServerController.customServerPort} port is currently in use by another application. Please select a different port and try again.", R.drawable.conflict)
+                                                customDialogManager.setSimpleDialogButtonText("Confirm")
+                                                customDialogManager.showCustomDialog()
+                                                return@withContext
+                                            }
 
-                    customDialogManager.showCustomDialog()
+                                            // DEFAULT SUNUCU SERVİSİ BAŞLATMA
+                                            ContextCompat.startForegroundService(this@MainActivity, defaultHttpIntent)
 
-                    return@setOnClickListener
-                }else{
+                                            // CUSTOM SUNUCU SERVİSİ BAŞLATMA
+                                            ContextCompat.startForegroundService(this@MainActivity, customHttpIntent)
 
-                    if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
-                        Log.e(TAG, "CustomServerPort is already used")
+                                            openServerButton.text = "Server(s) Running  -  STOP"
+                                            val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.custom_blue))
+                                            openServerButton.backgroundTintList = colorStateList
+                                            openServerButton.tag = "OPEN"
 
-                        val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Port Conflict","The selected custom server ${CustomServerController.customServerPort} port is currently in use by another application. Please select a different port and try again.", R.drawable.conflict)
-                        customDialogManager.setSimpleDialogButtonText("Confirm")
+                                            SharedPreferenceManager.writeInteger("customServerPort", CustomServerController.customServerPort)
+                                        }
+                                    } else {
+                                        stopService(customHttpIntent)
+                                        stopService(defaultHttpIntent)
 
-                        customDialogManager.showCustomDialog()
+                                        openServerButton.text = "OPEN SERVER(S) LETS GOOOOOOO!"
+                                        val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.custom_red))
+                                        openServerButton.backgroundTintList = colorStateList
+                                        openServerButton.tag = "CLOSE"
+                                    }
+                                }
+                            }
+                        }
 
-                        return@setOnClickListener
+
                     }
-
-                    //DEFAULT SUNUCU SERVİSİ BAŞLATMA
-                    ContextCompat.startForegroundService(this@MainActivity, defaultHttpIntent)
-
-                    //CUSTOM SUNUCU SERVİSİ BAŞLATMA
-                    ContextCompat.startForegroundService(this@MainActivity, customHttpIntent)
-
-                    openServerButton.text = "Server(s) Running  -  STOP"
-                    val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_blue))
-                    openServerButton.backgroundTintList = colorStateList
-                    openServerButton.tag = "OPEN"
-
-                    SharedPreferenceManager.writeInteger("customServerPort", CustomServerController.customServerPort)
-
                 }
-
-            }else{
-                stopService(customHttpIntent)
-                stopService(defaultHttpIntent)
-
-                openServerButton.text = "OPEN SERVER(S) LETS GOOOOOOO!"
-                val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_red))
-                openServerButton.backgroundTintList = colorStateList
-                openServerButton.tag = "CLOSE"
             }
 
-        }
 
 
 
-        bottomNav = binding.bottomNavigation
+            bottomNav = binding.bottomNavigation
 
         bottomNav.setOnItemSelectedListener  {item ->
             when (item.itemId) {

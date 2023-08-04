@@ -33,6 +33,8 @@ import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
+import com.ozgurbaykal.hostmobile.service.CustomHttpService
+import com.ozgurbaykal.hostmobile.service.ServiceUtils
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
 import kotlinx.coroutines.CoroutineScope
@@ -114,7 +116,16 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         folderListLinear.setOnClickListener {
 
-            openFolderAndFileListDialog()
+            val isCustomServerRunning = ServiceUtils.isServiceRunning(requireContext(), CustomHttpService::class.java)
+
+            if(isCustomServerRunning){
+                val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "Warning!","You cant edit folder and files for now, because custom server is running. Please stop server and try again.", R.drawable.warning)
+                customDialogManager.setSimpleDialogButtonText("Confirm")
+
+                customDialogManager.showCustomDialog()
+            }else{
+                openFolderAndFileListDialog()
+            }
         }
 
 

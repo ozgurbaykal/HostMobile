@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.util.Log
+import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -144,9 +145,13 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
                     dialog.setContentView(R.layout.custom_dialog_list)
 
                     val expandableListView = dialog.findViewById<ExpandableListView>(R.id.expandableListView)
+                    val confirmButton = dialog.findViewById<Button>(R.id.listDialogClickButton)
                     val adapter = ExpandableListAdapter(context, folderNames, folderFilesMap)
                     expandableListView.setAdapter(adapter)
 
+                    confirmButton.setOnClickListener {
+                        dialog.cancel()
+                    }
 
                     expandableListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
                         val folderName = folderNames[groupPosition]

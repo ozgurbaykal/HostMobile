@@ -55,6 +55,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:2.3.1")
     implementation("io.ktor:ktor-server-content-negotiation:2.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
+    implementation("io.ktor:ktor-serialization-gson:2.3.1")
 
     implementation "androidx.room:room-ktx:2.5.2"
     implementation("androidx.room:room-runtime:2.5.2")
@@ -62,4 +63,7 @@ dependencies {
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:2.5.2")
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
 }

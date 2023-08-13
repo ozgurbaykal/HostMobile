@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/custom_black2">
@@ -64,7 +65,59 @@
                 android:maxLength="4"
                 android:backgroundTint="@color/custom_edit_text_simple"/>
 
+
+            <LinearLayout
+                android:id="@+id/authRandomCodeLinear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auth Password For Connection"
+                    android:textColor="@color/custom_gray"
+                    android:textSize="19dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/custom_border_gray"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:id="@+id/authCodeText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:textColor="@color/custom_gray"
+                        android:textSize="29dp"
+                        android:textAlignment="center"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:paddingEnd="5dp"
+                        android:paddingStart="5dp"/>
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/authCodeProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressDrawable="@drawable/custom_progressbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:progress="100"
+                    android:max="100"
+                    android:min="0"/>
+            </LinearLayout>
+
+
+
         </LinearLayout>
+
+
 
         <RelativeLayout
             android:id="@+id/advancedSettingsRelativeLayoutButton"
@@ -106,7 +159,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
+
                 android:layout_below="@+id/textView1">
 
                 <LinearLayout
@@ -156,70 +209,135 @@
                 </LinearLayout>
 
 
+                <LinearLayout
+                    android:id="@+id/folderListLinear"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:background="@drawable/custom_border_gray"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="10dp">
 
-            <LinearLayout
-                android:id="@+id/folderListLinear"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Selected folder is "
+                            android:textColor="@color/white"
+                            android:textSize="15dp" />
+
+                        <TextView
+                            android:id="@+id/currentFolderName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="NONE"
+                            android:textColor="@color/custom_red"
+                            android:textSize="15dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Selected starter page is "
+                            android:textColor="@color/white"
+                            android:textSize="15dp" />
+
+                        <TextView
+                            android:id="@+id/currentFileName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:text="NONE.html"
+                            android:textColor="@color/custom_red"
+                            android:textSize="15dp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Click here to change"
+                        android:textColor="@color/white"
+                        android:textSize="11dp" />
+
+                </LinearLayout>
+
+
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_margin="15dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="10dp"
-                android:background="@drawable/custom_border_gray">
+                android:layout_gravity="center">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Selected folder is "
-                        android:textColor="@color/white"
-                        android:textSize="15dp" />
-
-                    <TextView
-                        android:id="@+id/currentFolderName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NONE"
-                        android:textColor="@color/custom_red"
-                        android:singleLine="true"
-                        android:textSize="15dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Selected starter page is "
-                        android:textColor="@color/white"
-                        android:textSize="15dp" />
-
-                    <TextView
-                        android:id="@+id/currentFileName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NONE.html"
-                        android:textColor="@color/custom_red"
-                        android:singleLine="true"
-                        android:textSize="15dp" />
-                </LinearLayout>
-
-                <TextView
+                <ImageView
+                    android:id="@+id/authInfo"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/info"
+                    android:translationZ="1dp"/>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Click here to change"
-                    android:textColor="@color/white"
-                    android:textSize="11dp" />
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:background="@drawable/custom_border_gray">
 
-            </LinearLayout>
+                <Button
+                    android:id="@+id/authButtonClose"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Close Authentication"
+                    android:background="@drawable/button_selected"
+                    app:backgroundTint="@color/custom_red"
+                    android:textColor="#FFFFFF"/>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#6a6a6a"/>
+
+                <Button
+                    android:id="@+id/authButtonOpen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_selected"
+                    android:text="Open Authentication"
+                    app:backgroundTint="@android:color/transparent"
+                    android:textColor="#FFFFFF"/>
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+
+
+
+
             </LinearLayout>
 
         </RelativeLayout>

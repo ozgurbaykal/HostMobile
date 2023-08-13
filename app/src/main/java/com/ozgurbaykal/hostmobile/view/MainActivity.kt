@@ -40,7 +40,7 @@ import java.io.File
 import java.io.IOException
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessStarter{
     private val TAG = "_MainActivity"
 
     private lateinit var binding: ActivityMainBinding
@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             openServerButton.setOnClickListener {
+
                 CoroutineScope(Dispatchers.IO).launch {
                     val database = AppDatabase.getDatabase(this@MainActivity)
                     val dao = database.folderDao()
@@ -141,6 +142,9 @@ class MainActivity : AppCompatActivity() {
                                             openServerButton.backgroundTintList = colorStateList
                                             openServerButton.tag = "OPEN"
 
+                                            val myFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
+                                            myFragment.startAuthCodeProcess()
+
                                             SharedPreferenceManager.writeInteger("customServerPort", CustomServerController.customServerPort)
                                         }
                                     } else {
@@ -151,6 +155,10 @@ class MainActivity : AppCompatActivity() {
                                         val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this@MainActivity, R.color.custom_red))
                                         openServerButton.backgroundTintList = colorStateList
                                         openServerButton.tag = "CLOSE"
+
+                                        val myFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
+                                        myFragment.stopAuthCodeProcess()
+
                                     }
                                 }
                             }
@@ -170,12 +178,12 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.page_1_bottom_nav_button -> {
                     Log.i(TAG, "Bottom Nav ClickEvent -> PAGE 1")
-                    changeFragment(CustomServerFragment(), R.id.main_fragment_view)
+                    changeFragment(CustomServerFragment(), R.id.main_fragment_view, "CustomFragmentTag")
                     return@setOnItemSelectedListener true
                 }
                 R.id.page_2_bottom_nav_button -> {
                     Log.i(TAG, "Bottom Nav ClickEvent -> PAGE 2")
-                    changeFragment(DefaultServerFragment(), R.id.main_fragment_view)
+                    changeFragment(DefaultServerFragment(), R.id.main_fragment_view, "DefaultFragmentTag")
                     return@setOnItemSelectedListener true
                 }
                 R.id.page_3_bottom_nav_button -> {
@@ -192,7 +200,7 @@ class MainActivity : AppCompatActivity() {
             if (savedInstanceState == null) {
                 supportFragmentManager.commit {
                     setReorderingAllowed(true)
-                    add<CustomServerFragment>(R.id.main_fragment_view)
+                    add<CustomServerFragment>(R.id.main_fragment_view, "CustomFragmentTag")
                 }
             }
 
@@ -269,11 +277,16 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun changeFragment(fragment: Fragment, frameId: Int) {
+    private fun changeFragment(fragment: Fragment, frameId: Int, tag: String) {
         supportFragmentManager.beginTransaction().apply {
-            replace(frameId, fragment)
+            replace(frameId, fragment, tag)
             commit()
         }
+    }
+
+    override fun startProcess() {
+        val fragment = supportFragmentManager.findFragmentByTag("YourFragmentTag") as CustomServerFragment
+        fragment.startAuthCodeProcess()
     }
 
 }

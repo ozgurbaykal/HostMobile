@@ -3,6 +3,7 @@ package com.ozgurbaykal.hostmobile.view
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -16,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ExpandableListView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -34,6 +36,7 @@ import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentCustomServerBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
 import com.ozgurbaykal.hostmobile.service.CustomHttpService
+import com.ozgurbaykal.hostmobile.service.CustomServerData
 import com.ozgurbaykal.hostmobile.service.ServiceUtils
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogManager
 import com.ozgurbaykal.hostmobile.view.customdialog.CustomDialogTypes
@@ -41,6 +44,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.Timer
+import java.util.TimerTask
+import kotlin.random.Random
 
 
 class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
@@ -68,6 +74,16 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private lateinit var folderListLinear : LinearLayout
 
+    private lateinit var authButtonClose : Button
+    private lateinit var authButtonOpen : Button
+    private lateinit var authInfo : ImageView
+
+    private lateinit var authCodeText : TextView
+    private lateinit var authCodeProgress : ProgressBar
+    private lateinit var authRandomCodeLinear : LinearLayout
+
+    private var timer: Timer? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,6 +94,10 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
         _binding = FragmentCustomServerBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        val customBlueColorTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.custom_blue))
+        val customRedColorTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.custom_red))
+        val customTransparentColorTint = ColorStateList.valueOf(Color.TRANSPARENT)
 
         advancedSettingsButton = binding.advancedSettingsRelativeLayoutButton
         dropDownLinear = binding.dropDownLinear
@@ -93,6 +113,15 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         currentFileName = binding.currentFileName
 
         folderListLinear = binding.folderListLinear
+
+        authButtonClose = binding.authButtonClose
+        authButtonOpen = binding.authButtonOpen
+        authInfo = binding.authInfo
+
+        authCodeText = binding.authCodeText
+        authCodeProgress = binding.authCodeProgress
+        authRandomCodeLinear = binding.authRandomCodeLinear
+
 
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
 
@@ -129,13 +158,6 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         }
 
 
-
-
-
-
-
-
-
         uploadFileLinear.setOnClickListener {
             Log.i(TAG, "uploadFileLinear clicked")
 
@@ -152,6 +174,25 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
                 dropDownLinear.visibility = View.GONE
             else
                 dropDownLinear.visibility = View.VISIBLE
+        }
+
+        authButtonClose.setOnClickListener {
+            authButtonClose.backgroundTintList = customRedColorTint
+            authButtonOpen.backgroundTintList = customTransparentColorTint
+            SharedPreferenceManager.writeBoolean("customServerAuthBoolean", false)
+        }
+
+        authButtonOpen.setOnClickListener {
+            authButtonClose.backgroundTintList = customTransparentColorTint
+            authButtonOpen.backgroundTintList = customBlueColorTint
+            SharedPreferenceManager.writeBoolean("customServerAuthBoolean", true)
+        }
+
+        authInfo.setOnClickListener {
+            val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "About Authentication","When this option is active, it asks for a 4-digit password when trying to connect to the custom server from any browser. After the user enters this password correctly, user is directed to the selected home page.", R.drawable.info)
+            customDialogManager.setSimpleDialogButtonText("Confirm")
+
+            customDialogManager.showCustomDialog()
         }
 
 
@@ -171,6 +212,10 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val customBlueColorTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.custom_blue))
+        val customRedColorTint = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.custom_red))
+        val customTransparentColorTint = ColorStateList.valueOf(Color.TRANSPARENT)
+
         folderViewModel.selectedFolder.observe(viewLifecycleOwner) { folder ->
             folder?.let {
                 currentFolderName.text = it.folderName
@@ -179,6 +224,53 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
             }
         }
 
+        if(SharedPreferenceManager.readBoolean("customServerAuthBoolean", false) == true){
+            authButtonClose.backgroundTintList = customTransparentColorTint
+            authButtonOpen.backgroundTintList = customBlueColorTint
+        }else{
+            authButtonClose.backgroundTintList = customRedColorTint
+            authButtonOpen.backgroundTintList = customTransparentColorTint
+        }
+
+    }
+
+
+     fun startAuthCodeProcess() {
+        stopAuthCodeProcess() // Eğer bir timer zaten çalışıyorsa durdur
+
+         generateAndSetAuthCode()
+         authRandomCodeLinear.visibility = View.VISIBLE
+
+        timer = Timer()
+        timer?.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                MainActivity.getInstance()?.runOnUiThread {
+
+
+                    val currentProgress = authCodeProgress.progress
+                    if (currentProgress == 0) {
+                        authCodeProgress.progress = 100
+                        generateAndSetAuthCode()
+                    } else {
+                        authCodeProgress.progress = currentProgress - 10 // Her 1 saniyede %10 artır
+                    }
+                }
+            }
+        }, 0, 1000) // 1000 ms = 1 saniye
+    }
+
+     fun stopAuthCodeProcess() {
+        timer?.cancel()
+        timer = null
+        authCodeProgress.progress = 0
+         authCodeText.text = "----"
+         authRandomCodeLinear.visibility = View.GONE
+    }
+
+    private fun generateAndSetAuthCode() {
+        val randomCode = Random.nextInt(1000, 9999)
+        CustomServerData.authPassword = randomCode
+        authCodeText.text = randomCode.toString()
     }
 
     private fun openFolderAndFileListDialog(){
@@ -266,7 +358,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         }
     }
 
-
-
+    interface AuthCodeProcessStarter {
+        fun startProcess()
+    }
 
 }

@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.21'  // Sürüm numarası değişebilir.
 }
 
 android {
@@ -56,6 +57,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:2.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
     implementation("io.ktor:ktor-serialization-gson:2.3.1")
+    implementation("io.ktor:ktor-server-auth:2.3.1")
+    implementation("io.ktor:ktor-server-auth-jwt:2.3.1")
 
     implementation "androidx.room:room-ktx:2.5.2"
     implementation("androidx.room:room-runtime:2.5.2")

@@ -77,6 +77,7 @@ async function loginClick(){
 
         if(data.password_status === true) {
             Swal.fire('Success!', 'Password Correct', 'success');
+
             location.reload();
         } else if(data.password_status === false) {
             Swal.fire('Error!', 'Wrong Password.', 'error');

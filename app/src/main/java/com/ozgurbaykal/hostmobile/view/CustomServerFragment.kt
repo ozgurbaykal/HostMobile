@@ -269,7 +269,7 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private fun generateAndSetAuthCode() {
         val randomCode = Random.nextInt(1000, 9999)
-        CustomServerData.authPassword = randomCode
+        CustomServerData.customServerAuthPassword = randomCode
         authCodeText.text = randomCode.toString()
     }
 

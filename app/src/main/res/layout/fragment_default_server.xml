@@ -64,6 +64,53 @@
                 android:enabled="false"
                 android:backgroundTint="@color/custom_edit_text_simple"/>
 
+            <LinearLayout
+                android:id="@+id/authRandomCodeLinear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp"
+                android:visibility="gone">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auth Password For Connection"
+                    android:textColor="@color/custom_gray"
+                    android:textSize="19dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/custom_border_gray"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:id="@+id/authCodeText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="----"
+                        android:textColor="@color/custom_gray"
+                        android:textSize="29dp"
+                        android:textAlignment="center"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:paddingEnd="5dp"
+                        android:paddingStart="5dp"/>
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/authCodeProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressDrawable="@drawable/custom_progressbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:progress="100"
+                    android:max="100"
+                    android:min="0"/>
+            </LinearLayout>
+
         </LinearLayout>
 
         <RelativeLayout

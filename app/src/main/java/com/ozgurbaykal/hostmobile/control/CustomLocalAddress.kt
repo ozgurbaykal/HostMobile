@@ -7,7 +7,14 @@ object CustomLocalAddress {
 
     private fun Context.getConnectivityManager() = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    fun getIpAddress(context: Context) = with(context.getConnectivityManager()) {
-        getLinkProperties(activeNetwork)!!.linkAddresses[1].address.hostAddress!!
+    fun getIpAddress(context: Context): String? {
+        val linkProperties = context.getConnectivityManager().getLinkProperties(context.getConnectivityManager().activeNetwork)
+
+
+        if (linkProperties == null || linkProperties.linkAddresses.size < 2) {
+            return null
+        }
+
+        return linkProperties.linkAddresses[1].address.hostAddress
     }
 }

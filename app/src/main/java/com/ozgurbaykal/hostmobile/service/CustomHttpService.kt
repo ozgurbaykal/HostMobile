@@ -295,7 +295,7 @@ class CustomHttpService : Service() {
                     val data: Map<String, String> = Gson().fromJson(requestData, Map::class.java) as Map<String, String>
                     val clientPassword = data["password"]
 
-                    val serverPasswordEncrypted = sha256(CustomServerData.authPassword.toString())  // sunucudaki şifreyi şifreleyin
+                    val serverPasswordEncrypted = sha256(CustomServerData.customServerAuthPassword.toString())  // sunucudaki şifreyi şifreleyin
 
                     if (clientPassword == serverPasswordEncrypted) {
                         // Şifre doğru

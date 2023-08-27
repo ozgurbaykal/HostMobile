@@ -142,8 +142,19 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                                             openServerButton.backgroundTintList = colorStateList
                                             openServerButton.tag = "OPEN"
 
-                                            val myFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
-                                            myFragment.startAuthCodeProcess()
+                                            try {
+                                                val findCustomFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
+                                                findCustomFragment.startAuthCodeProcess()
+                                            }catch (e: Exception){
+                                                e.printStackTrace()
+                                            }
+
+                                            try {
+                                                val findDefaultDefaultFragment = supportFragmentManager.findFragmentByTag("DefaultFragmentTag") as DefaultServerFragment
+                                                findDefaultDefaultFragment.startAuthCodeProcess()
+                                            }catch (e: Exception){
+                                                e.printStackTrace()
+                                            }
 
                                             SharedPreferenceManager.writeInteger("customServerPort", CustomServerController.customServerPort)
                                         }
@@ -156,8 +167,20 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                                         openServerButton.backgroundTintList = colorStateList
                                         openServerButton.tag = "CLOSE"
 
-                                        val myFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
-                                        myFragment.stopAuthCodeProcess()
+                                        try {
+                                            val findCustomFragment = supportFragmentManager.findFragmentByTag("CustomFragmentTag") as CustomServerFragment
+                                            findCustomFragment.stopAuthCodeProcess()
+
+                                        }catch (e: Exception){
+                                            e.printStackTrace()
+                                        }
+
+                                        try {
+                                            val findDefaultDefaultFragment = supportFragmentManager.findFragmentByTag("DefaultFragmentTag") as DefaultServerFragment
+                                            findDefaultDefaultFragment.stopAuthCodeProcess()
+                                        }catch (e: Exception){
+                                            e.printStackTrace()
+                                        }
 
                                     }
                                 }

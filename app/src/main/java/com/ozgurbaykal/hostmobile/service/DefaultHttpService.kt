@@ -169,8 +169,38 @@ class DefaultHttpService : Service() {
                             .build()
                             .verify(cookieToken)
 //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA DEFAULT SERVER İLE İLGİLİ SİTEYİ GÖSTER (API)
+                        Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
 
-                            Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
+                        val assetManager = applicationContext.assets
+                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
+                        if (requestPath.isEmpty()) {
+                            Log.i(TAG, "herhangi bir link yok direkt ana sayfaya yönlendir")
+                            val authContent = assetManager.open("DefaultServerWeb/default-server-main.html").use { it.readBytes() }
+                            call.respondBytes(authContent, ContentType.Text.Html)
+                            return@get
+                        }else{
+                            try {
+                                // assets klasöründe bu dosya var mı kontrol et
+                                requestPath.split("-").last()
+
+                                requestPath = "DefaultServerWeb/" + requestPath
+                                Log.i(TAG, "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath)
+
+                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
+
+                                // Dosyanın içeriğini doğrudan bayt olarak oku
+                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
+
+                                // İçeriği yanıt olarak gönder
+                                call.respondBytes(fileContent, contentType)
+
+                                return@get
+                            } catch (e: IOException) {
+                                Log.e(TAG, "DOSYA BULAMADI")
+                                // Dosya bulunamadıysa bu bloğa girecektir.
+                            }
+                        }
+
 
                     } catch (e: JWTVerificationException) {
 

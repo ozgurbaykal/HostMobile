@@ -8,24 +8,26 @@
 </head>
 <body>
 
-    <div class="title" style=" padding: 20px 75px; border: 2px solid #6a6a6a71;">
-        You can send your website folder to CustomServer, from this page. Thus, you can complete the folder upload process from your computer more easily than the phone.
-        <br><br> 
-        (For now, only folder upload is available, in the future, features in the mobile application such as choosing the start page, viewing existing folders will also be added to this page.)
-    </div>
+<div class="title" style=" padding: 20px 75px; border: 2px solid #6a6a6a71;">
+    You can send your website folder to CustomServer from this page. Thus, you can complete the folder upload process from your computer more easily than the phone.
+    <br><br>
+    (For now, only folder upload is available, in the future, features in the mobile application such as choosing the start page, viewing existing folders will also be added to this page.)
+</div>
 
-    <div class="selected-info" style="margin-bottom: 50px; padding: 20px 75px; border: 2px solid #6a6a6a71;">
-        <span style="margin-right: 10px; color: white;">Selected folder is</span> <span style="color: #de614b;">.......</span>
-        <br>
-        <span style="margin-right: 10px; color: white;">Selected starter page is</span> <span style="color: #de614b;">.......</span>
-    </div>
-    
-    <div class="options">
-        <div class="option">
+<div class="selected-info" style="margin-bottom: 50px; padding: 20px 75px; border: 2px solid #6a6a6a71;">
+    <span style="margin-right: 10px; color: white;">Selected folder is</span> <span style="color: #de614b;">.......</span>
+    <br>
+    <span style="margin-right: 10px; color: white;">Selected starter page is</span> <span style="color: #de614b;">.......</span>
+</div>
+<input type="file" id="folderUploader" webkitdirectory style="display: none;" onchange="handleFolderSelection(event)">
 
-                Upload Folder To App
-           
-        </div>
+<div class="options" onclick="uploadFolders()">
+    <div class="option">
+
+        Upload Folder To App
+
     </div>
+</div>
 </body>
+<script src="upload-folder-script.js"></script>
 </html>

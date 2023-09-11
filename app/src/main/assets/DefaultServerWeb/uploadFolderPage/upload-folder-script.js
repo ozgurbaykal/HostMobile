@@ -18,9 +18,22 @@ fetch(httpLink, {
     method: 'POST',
     body: folderData
 })
-.then(response => response.json())
+.then(response => {
+    if (response.ok) {
+        Swal.fire('Success!', 'Your folder successfully uploaded to app.', 'success');
+    }
+    return response.json();
+})
 .then(data => {
-    console.log(data.message);
+    console.log(data.message + " ERROR CODE: " + data.error_code);
+
+    if(data.error_code == 21001){
+        Swal.fire('Error!', 'Server cant find folder name in your request, please try again.', 'error');
+    }else if(data.error_code == 21002){
+        Swal.fire('Error!', 'Failed to create directory on server side, please try again.', 'error');
+    }else if(data.error_code == 21003){
+             Swal.fire('Error!', 'Internal server error, please try again.', 'error');
+    }
 })
 .catch(error => {
     console.error("Error fetching: ", error);

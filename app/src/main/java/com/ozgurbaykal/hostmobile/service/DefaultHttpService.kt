@@ -60,6 +60,9 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.util.Date
 import com.auth0.jwt.interfaces.JWTVerifier
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
 class DefaultHttpService : Service() {
 
     private val TAG = "_DefaultHttpService"
@@ -114,7 +117,12 @@ class DefaultHttpService : Service() {
 
 
         install(ContentNegotiation) {
-            json()
+            json(Json {
+                isLenient = true
+                ignoreUnknownKeys = true
+                allowSpecialFloatingPointValues = true
+                useArrayPolymorphism = true
+            })
             gson()
         }
 
@@ -283,7 +291,7 @@ class DefaultHttpService : Service() {
             }
 
 
-
+            //ROUTE CODE 02
             authenticate("auth-jwt") {
                 post("/postWebFolders") {
 
@@ -302,7 +310,7 @@ class DefaultHttpService : Service() {
                                      val fileBytes = part.streamProvider().readBytes()
 
                                      if (folderName == null) {
-                                         call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
+                                         call.respond(HttpStatusCode.BadRequest, ErrorResponse(21001, "folderName is missing"))
                                          return@post
                                      }
 
@@ -319,13 +327,13 @@ class DefaultHttpService : Service() {
                                      if (!fullPath.parentFile.exists()) {
                                          if (!fullPath.parentFile.mkdirs()) {
                                              Log.i(TAG, "Failed to create directory: ${fullPath.parentFile}")
-                                             call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Failed to create directory"))
+                                             call.respond(HttpStatusCode.InternalServerError, ErrorResponse(21002, "Failed to create directory"))
                                              return@post
                                          }
                                      }
 
                                      fullPath.writeBytes(fileBytes)
-                                     Log.i(TAG, "/postWebFolders request-3")
+
                                  }
                                  is PartData.FormItem -> {
                                      if (part.name == "folderName") {
@@ -334,7 +342,7 @@ class DefaultHttpService : Service() {
                                      } else if (part.name == "filePaths[]") {
                                          relativePaths.add(part.value)
                                      }
-                                     Log.i(TAG, "/postWebFolders request-4")
+
                                  }
                                  else -> {}
                              }
@@ -342,12 +350,11 @@ class DefaultHttpService : Service() {
                          }
 
                          if (folderName == null) {
-                             call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
+                             call.respond(HttpStatusCode.BadRequest, ErrorResponse(21001, "folderName is missing"))
                              return@post
                          }
 
-                         Log.i(TAG, "/postWebFolders request-5")
-                         // DAO işlemleri
+
                          val database = AppDatabase.getDatabase(applicationContext)
                          val dao = database.folderDao()
                          val totalData = dao.getAll().size
@@ -362,7 +369,7 @@ class DefaultHttpService : Service() {
                      } catch (e: Exception) {
                          Log.i(TAG, "/postWebFolders ERROR: ")
                          e.printStackTrace()
-                         call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Internal server error"))
+                         call.respond(HttpStatusCode.BadRequest, ErrorResponse(21003, "Internal Server Error"))
                      }
                 }
             }
@@ -375,7 +382,7 @@ class DefaultHttpService : Service() {
 
 
 
-            //EN SON BURAYI CHATGPTDEN ALDIĞIMI EKLEMEDİM BURAYI EKLEYİNCE Bİ HATA OLUYODU BAKCAKTIM GERİ ALDIM
+
             post("/postAuthPassword") {
                 try {
                     val requestData = call.receiveText()
@@ -436,5 +443,8 @@ class DefaultHttpService : Service() {
 
         startForeground(2, notification)
     }
+
+    @Serializable
+    data class ErrorResponse(val error_code: Int, val message: String)
 
 }

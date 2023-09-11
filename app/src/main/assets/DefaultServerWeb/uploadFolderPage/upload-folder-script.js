@@ -14,19 +14,37 @@ for (let i = 0; i < files.length; i++) {
 }
 
     var httpLink = "http://" + location.host + "/postWebFolders";
+
+       Swal.fire({
+            title: 'Sending...',
+            text: 'Please Wait.',
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            allowOutsideClick: false,
+            timer: 10000,
+            timerProgressBar: true
+        });
+
+
 fetch(httpLink, {
     method: 'POST',
     body: folderData
 })
 .then(response => {
-    if (response.ok) {
-        Swal.fire('Success!', 'Your folder successfully uploaded to app.', 'success');
-    }
+Swal.close();
+
+  setTimeout(() => {
+        if (response.ok) {
+            Swal.fire('Success!', 'Your folder successfully uploaded to app.', 'success');
+        }
+    }, 200);
     return response.json();
 })
 .then(data => {
     console.log(data.message + " ERROR CODE: " + data.error_code);
-
+Swal.close();
+setTimeout(() => {
     if(data.error_code == 21001){
         Swal.fire('Error!', 'Server cant find folder name in your request, please try again.', 'error');
     }else if(data.error_code == 21002){
@@ -34,9 +52,15 @@ fetch(httpLink, {
     }else if(data.error_code == 21003){
              Swal.fire('Error!', 'Internal server error, please try again.', 'error');
     }
+    }, 200);
 })
 .catch(error => {
+Swal.close();
+
+setTimeout(() => {
+Swal.fire('Error!', 'Something happened, please try again.', 'error');
     console.error("Error fetching: ", error);
+     }, 200);
 });
 
 }

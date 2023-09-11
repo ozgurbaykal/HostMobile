@@ -52,14 +52,14 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation("androidx.fragment:fragment-ktx:1.5.7")
 
-    implementation("io.ktor:ktor-server-core:2.3.1")
-    implementation("io.ktor:ktor-server-netty:2.3.1")
-    implementation("io.ktor:ktor-server-content-negotiation:2.3.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
-    implementation("io.ktor:ktor-serialization-gson:2.3.1")
-    implementation("io.ktor:ktor-server-auth:2.3.1")
-    implementation("io.ktor:ktor-server-auth-jwt:2.3.1")
-    implementation("io.ktor:ktor-server-cors:2.3.1")
+    implementation("io.ktor:ktor-server-core:2.3.4")
+    implementation("io.ktor:ktor-server-netty:2.3.4")
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.4")
+    implementation("io.ktor:ktor-serialization-gson:2.3.4")
+    implementation("io.ktor:ktor-server-auth:2.3.4")
+    implementation("io.ktor:ktor-server-auth-jwt:2.3.4")
+    implementation("io.ktor:ktor-server-cors:2.3.4")
 
     implementation "androidx.room:room-ktx:2.5.2"
     implementation("androidx.room:room-runtime:2.5.2")

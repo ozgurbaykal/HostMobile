@@ -24,6 +24,7 @@ import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.auth.parseAuthorizationHeader
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.readAllParts
@@ -36,6 +37,8 @@ import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.UserIdPrincipal
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -56,7 +59,7 @@ import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 import java.util.Date
-
+import com.auth0.jwt.interfaces.JWTVerifier
 class DefaultHttpService : Service() {
 
     private val TAG = "_DefaultHttpService"
@@ -106,7 +109,6 @@ class DefaultHttpService : Service() {
 
         intercept(ApplicationCallPipeline.Plugins) {
             Log.i(TAG, "Intercept block started")
-
         }
 
 
@@ -133,27 +135,36 @@ class DefaultHttpService : Service() {
             maxAgeInSeconds = 24 * 60 * 60
         }
 
-
-
         install(Authentication) {
-            Log.i(TAG, "install Authentication BLOĞUNDA")
-
-            jwt {
-                Log.i(TAG, "JWT BLOĞUNDA")
+            jwt("auth-jwt") {
                 realm = jwtRealm
-                verifier(
-                    JWT.require(Algorithm.HMAC256(jwtSecret))
-                        .withIssuer(jwtIssuer)
-                        .build())
-                validate { credential ->
-                    val jwt = credential.payload
+                val jwtAlgorithm = Algorithm.HMAC256(jwtSecret)
+                verifier(JWT.require(jwtAlgorithm).withIssuer(jwtIssuer).build())
 
-                    val name = jwt.getClaim("name").asString()
-                    Log.i(TAG, "JWT validate function called name: $name")
-                    if (name != null) UserIdPrincipal(name) else null
+                authHeader { call ->
+                    val cookieValue = call.request.cookies["auth_token"] ?: return@authHeader null
+                    Log.i(TAG, " cookieValue: " + cookieValue)
+
+                    try {
+                        parseAuthorizationHeader("Bearer $cookieValue")
+                    } catch (cause: IllegalArgumentException) {
+                        cause.message
+                        null
+                    }
+                }
+
+                validate { credential ->
+                    if (credential.payload.getClaim("name").asString() == jwtIssuer) {
+                        JWTPrincipal(credential.payload)
+                    } else {
+                        null
+                    }
                 }
             }
         }
+
+
+
 
         routing {
 
@@ -272,88 +283,95 @@ class DefaultHttpService : Service() {
             }
 
 
-            post("/postWebFolders") {
-                Log.i(TAG, "/postWebFolders request-1")
 
+            authenticate("auth-jwt") {
+                post("/postWebFolders") {
 
-                try {
-                    val multipart = call.receiveMultipart()
-                    var folderName: String? = null
-                    val appSpecificExternalDir = ContextCompat.getExternalFilesDirs(applicationContext, null)[0]
+                     try {
+                         val multipart = call.receiveMultipart()
+                         var folderName: String? = null
+                         val appSpecificExternalDir = ContextCompat.getExternalFilesDirs(applicationContext, null)[0]
 
-                    val parts = multipart.readAllParts() // Bu, tüm parçaları bir listeye alacak
-                    val relativePaths = mutableListOf<String>()
+                         val parts = multipart.readAllParts() // Bu, tüm parçaları bir listeye alacak
+                         val relativePaths = mutableListOf<String>()
 
-                    for (part in parts) {
-                        when (part) {
-                            is PartData.FileItem -> {
-                                val ext = File(part.originalFileName!!).extension
-                                val fileBytes = part.streamProvider().readBytes()
+                         for (part in parts) {
+                             when (part) {
+                                 is PartData.FileItem -> {
+                                     val ext = File(part.originalFileName!!).extension
+                                     val fileBytes = part.streamProvider().readBytes()
 
-                                if (folderName == null) {
-                                    call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
-                                    return@post
-                                }
+                                     if (folderName == null) {
+                                         call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
+                                         return@post
+                                     }
 
-                                val basePath = File(applicationContext.getExternalFilesDir(null), folderName)
+                                     val basePath = File(applicationContext.getExternalFilesDir(null), folderName)
 
-                                // İlgili yolu al
-                                val relativePath = relativePaths.removeAt(0) // İlk elemanı al ve kaldır
+                                     // İlgili yolu al
+                                     val relativePath = relativePaths.removeAt(0) // İlk elemanı al ve kaldır
 
-                                // Ana klasör ismini yoldan çıkar
-                                val cleanedPath = relativePath.replace("$folderName/", "")
+                                     // Ana klasör ismini yoldan çıkar
+                                     val cleanedPath = relativePath.replace("$folderName/", "")
 
-                                val fullPath = File(basePath, cleanedPath)
+                                     val fullPath = File(basePath, cleanedPath)
 
-                                if (!fullPath.parentFile.exists()) {
-                                    if (!fullPath.parentFile.mkdirs()) {
-                                        Log.i(TAG, "Failed to create directory: ${fullPath.parentFile}")
-                                        call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Failed to create directory"))
-                                        return@post
-                                    }
-                                }
+                                     if (!fullPath.parentFile.exists()) {
+                                         if (!fullPath.parentFile.mkdirs()) {
+                                             Log.i(TAG, "Failed to create directory: ${fullPath.parentFile}")
+                                             call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Failed to create directory"))
+                                             return@post
+                                         }
+                                     }
 
-                                fullPath.writeBytes(fileBytes)
-                                Log.i(TAG, "/postWebFolders request-3")
-                            }
-                            is PartData.FormItem -> {
-                                if (part.name == "folderName") {
-                                    folderName = part.value
-                                    Log.i(TAG, "/postWebFolders folderName: $folderName")
-                                } else if (part.name == "filePaths[]") {
-                                    relativePaths.add(part.value)
-                                }
-                                Log.i(TAG, "/postWebFolders request-4")
-                            }
-                            else -> {}
-                        }
-                        part.dispose()
-                    }
+                                     fullPath.writeBytes(fileBytes)
+                                     Log.i(TAG, "/postWebFolders request-3")
+                                 }
+                                 is PartData.FormItem -> {
+                                     if (part.name == "folderName") {
+                                         folderName = part.value
+                                         Log.i(TAG, "/postWebFolders folderName: $folderName")
+                                     } else if (part.name == "filePaths[]") {
+                                         relativePaths.add(part.value)
+                                     }
+                                     Log.i(TAG, "/postWebFolders request-4")
+                                 }
+                                 else -> {}
+                             }
+                             part.dispose()
+                         }
 
-                    if (folderName == null) {
-                        call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
-                        return@post
-                    }
+                         if (folderName == null) {
+                             call.respond(HttpStatusCode.BadRequest, mapOf("message" to "folderName is missing"))
+                             return@post
+                         }
 
-                    Log.i(TAG, "/postWebFolders request-5")
-                    // DAO işlemleri
-                    val database = AppDatabase.getDatabase(applicationContext)
-                    val dao = database.folderDao()
-                    val totalData = dao.getAll().size
-                    val isSelected = totalData == 0
-                    Log.i(TAG, " totalData == 0: " + (totalData == 0) + " isSelected: " + isSelected + " totalData:  " + totalData)
-                    val customServerFolders = CustomServerFolders(id = 0, folderName = folderName, isSelected = isSelected)
-                    dao.insert(customServerFolders)
+                         Log.i(TAG, "/postWebFolders request-5")
+                         // DAO işlemleri
+                         val database = AppDatabase.getDatabase(applicationContext)
+                         val dao = database.folderDao()
+                         val totalData = dao.getAll().size
+                         val isSelected = totalData == 0
+                         Log.i(TAG, " totalData == 0: " + (totalData == 0) + " isSelected: " + isSelected + " totalData:  " + totalData)
+                         val customServerFolders = CustomServerFolders(id = 0, folderName = folderName, isSelected = isSelected)
+                         dao.insert(customServerFolders)
 
-                    Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
-                    call.respond(HttpStatusCode.OK, mapOf("message" to "Files uploaded successfully"))
+                         Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
+                         call.respond(HttpStatusCode.OK, mapOf("message" to "Files uploaded successfully"))
 
-                } catch (e: Exception) {
-                    Log.i(TAG, "/postWebFolders ERROR: ")
-                    e.printStackTrace()
-                    call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Internal server error"))
+                     } catch (e: Exception) {
+                         Log.i(TAG, "/postWebFolders ERROR: ")
+                         e.printStackTrace()
+                         call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Internal server error"))
+                     }
                 }
             }
+
+
+
+
+
+
 
 
 

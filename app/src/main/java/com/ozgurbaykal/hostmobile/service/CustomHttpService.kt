@@ -20,6 +20,7 @@ import com.ozgurbaykal.hostmobile.model.AppDatabase
 import io.ktor.http.ContentType
 import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.auth.parseAuthorizationHeader
 import io.ktor.serialization.gson.gson
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.call
@@ -116,25 +117,32 @@ class CustomHttpService : Service() {
         }
 
         install(Authentication) {
-            Log.i(TAG, "install Authentication BLOĞUNDA")
-
-            jwt {
-                Log.i(TAG, "JWT BLOĞUNDA")
+            jwt("auth-jwt") {
                 realm = jwtRealm
-                verifier(
-                    JWT.require(Algorithm.HMAC256(jwtSecret))
-                        .withIssuer(jwtIssuer)
-                        .build())
-                validate { credential ->
-                    val jwt = credential.payload
+                val jwtAlgorithm = Algorithm.HMAC256(jwtSecret)
+                verifier(JWT.require(jwtAlgorithm).withIssuer(jwtIssuer).build())
 
-                    val name = jwt.getClaim("name").asString()
-                    Log.i(TAG, "JWT validate function called name: $name")
-                    if (name != null) UserIdPrincipal(name) else null
+                authHeader { call ->
+                    val cookieValue = call.request.cookies["auth_token"] ?: return@authHeader null
+                    Log.i(TAG, " cookieValue: " + cookieValue)
+
+                    try {
+                        parseAuthorizationHeader("Bearer $cookieValue")
+                    } catch (cause: IllegalArgumentException) {
+                        cause.message
+                        null
+                    }
+                }
+
+                validate { credential ->
+                    if (credential.payload.getClaim("name").asString() == jwtIssuer) {
+                        JWTPrincipal(credential.payload)
+                    } else {
+                        null
+                    }
                 }
             }
         }
-
 
 
 
@@ -153,35 +161,30 @@ class CustomHttpService : Service() {
                     //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
                     if (cookieToken == null) {
 
+                        val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
+                        Log.i(TAG, "fileExtension:  $fileExtension")
 
-                        val assetManager = applicationContext.assets
-                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
-                        if (requestPath.isEmpty()) {
-                            Log.i(TAG, "auth-login.html için if bloğuna girdi")
-                            val authContent = assetManager.open("auth-login.html").use { it.readBytes() }
+                        if (fileExtension == "html" || fileExtension.isEmpty()) {
+                            // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR
+                            val authContent = applicationContext.assets.open("auth-login.html")
+                                .use { it.readBytes() }
                             call.respondBytes(authContent, ContentType.Text.Html)
                             return@get
-                        }else{
+                        } else {
+                            // JS, CSS, resim vb. için
                             try {
-                                // assets klasöründe bu dosya var mı kontrol et
-                                requestPath.split("-").last()
-                                Log.i(TAG, "auth-login.html için ELSE bloğuna girdi requestPath: " + requestPath)
+                                requestPath = requestPath.split("/").last()
+                                Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
 
-                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
-
-                                // Dosyanın içeriğini doğrudan bayt olarak oku
-                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
-                                // İçeriği yanıt olarak gönder
+                                val contentType = getContentType(File(requestPath))
+                                val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
                                 call.respondBytes(fileContent, contentType)
-
                                 return@get
                             } catch (e: IOException) {
-                                Log.e(TAG, "DOSYA BULAMADI")
-                                // Dosya bulunamadıysa bu bloğa girecektir.
+                                // Dosya bulunamazsa hata logu
+                                Log.e(TAG, "COOKIE NULL BLOĞUNDA DOSYA BULAMADI")
                             }
                         }
-
 
                     }
 
@@ -190,7 +193,7 @@ class CustomHttpService : Service() {
                             .withIssuer(jwtIssuer)
                             .build()
                             .verify(cookieToken)
-//TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA KULLANICININ SEÇTİĞİ WEB SİTESİNİ ARTIK GÖSTER
+                        //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA KULLANICININ SEÇTİĞİ WEB SİTESİNİ ARTIK GÖSTER
 
                         val dao = db.folderDao()
                         val folder = dao.getSelectedFolder()
@@ -211,6 +214,8 @@ class CustomHttpService : Service() {
                             Log.i(TAG, "file is exist FILE PATH: " + fullPath)
                             val contentType = getContentType(file)
                             val content = file.readBytes()
+                            val token = makeToken()
+                            call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
                             call.respondBytes(content, contentType)
                         } else {
                             Log.i(TAG, "file doesn't exist FILE PATH: " + fullPath)
@@ -220,31 +225,28 @@ class CustomHttpService : Service() {
                     } catch (e: JWTVerificationException) {
 
                         //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
-                        val assetManager = applicationContext.assets
-                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
-                        if (requestPath.isEmpty()) {
-                            Log.i(TAG, "auth-login.html için if bloğuna girdi")
-                            val authContent = assetManager.open("auth-login.html").use { it.readBytes() }
+                        val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
+                        Log.i(TAG, "fileExtension:  $fileExtension")
+
+                        if (fileExtension == "html" || fileExtension.isEmpty()) {
+                            // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR
+                            val authContent = applicationContext.assets.open("auth-login.html")
+                                .use { it.readBytes() }
                             call.respondBytes(authContent, ContentType.Text.Html)
                             return@get
-                        }else{
+                        } else {
+                            // JS, CSS, resim vb. için
                             try {
-                                // assets klasöründe bu dosya var mı kontrol et
-                                requestPath.split("-").last()
-                                Log.i(TAG, "auth-login.html için ELSE bloğuna girdi requestPath: " + requestPath)
+                                requestPath = requestPath.split("/").last()
+                                Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
 
-                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
-
-                                // Dosyanın içeriğini doğrudan bayt olarak oku
-                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
-                                // İçeriği yanıt olarak gönder
+                                val contentType = getContentType(File(requestPath))
+                                val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
                                 call.respondBytes(fileContent, contentType)
-
                                 return@get
                             } catch (e: IOException) {
-                                Log.e(TAG, "DOSYA BULAMADI")
-                                // Dosya bulunamadıysa bu bloğa girecektir.
+                                // Dosya bulunamazsa hata logu
+                                Log.e(TAG, "COOKIE NULL BLOĞUNDA DOSYA BULAMADI")
                             }
                         }
 

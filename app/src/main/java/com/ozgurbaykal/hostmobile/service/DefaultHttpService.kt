@@ -101,11 +101,10 @@ class DefaultHttpService : Service() {
             .withClaim(
                 "name",
                 "ozgurbaykal"
-            )  // Burada "YourUsernameHere" yerine istediğiniz değeri koyabilirsiniz.
+            )
             .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))  // 1 saatlik süre.
             .sign(jwtAlgorithm)
     }
-
     fun sha256(value: String): String {
         val bytes = MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8))
         return bytes.joinToString("") { "%02x".format(it) }
@@ -231,6 +230,8 @@ class DefaultHttpService : Service() {
                         val authContent =
                             assetManager.open("DefaultServerWeb/default-server-main.html")
                                 .use { it.readBytes() }
+                        val token = makeToken()
+                        call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
                         call.respondBytes(authContent, ContentType.Text.Html)
                         return@get
                     } else {
@@ -243,7 +244,8 @@ class DefaultHttpService : Service() {
                             val contentType = getContentType(File(requestPath))
 
                             val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
+                            val token = makeToken()
+                            call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
                             call.respondBytes(fileContent, contentType)
                             return@get
                         } catch (e: IOException) {
@@ -384,6 +386,8 @@ class DefaultHttpService : Service() {
                         dao.insert(customServerFolders)
 
                         Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
+                        val token = makeToken()
+                        call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
                         call.respond(
                             HttpStatusCode.OK,
                             mapOf("message" to "Files uploaded successfully")

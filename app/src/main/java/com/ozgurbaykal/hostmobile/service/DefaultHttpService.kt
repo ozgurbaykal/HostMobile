@@ -67,7 +67,8 @@ class DefaultHttpService : Service() {
 
     private val TAG = "_DefaultHttpService"
 
-    val jwtSecret = "NqDU0Bgcx7SEaJPZkNNYxTbsmJl5u"  // Bu anahtarı güvenli bir yerde saklamalısınız.
+    val jwtSecret =
+        "NqDU0Bgcx7SEaJPZkNNYxTbsmJl5u"  // Bu anahtarı güvenli bir yerde saklamalısınız.
     val jwtIssuer = "ozgurbaykal"
     val jwtRealm = "hostmobile"
 
@@ -97,7 +98,10 @@ class DefaultHttpService : Service() {
         val jwtAlgorithm = Algorithm.HMAC256(jwtSecret)
         return JWT.create()
             .withIssuer(jwtIssuer)
-            .withClaim("name", "ozgurbaykal")  // Burada "YourUsernameHere" yerine istediğiniz değeri koyabilirsiniz.
+            .withClaim(
+                "name",
+                "ozgurbaykal"
+            )  // Burada "YourUsernameHere" yerine istediğiniz değeri koyabilirsiniz.
             .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))  // 1 saatlik süre.
             .sign(jwtAlgorithm)
     }
@@ -108,7 +112,7 @@ class DefaultHttpService : Service() {
     }
 
 
-    private val server = embeddedServer(Netty, port = 49761,"0.0.0.0") {
+    private val server = embeddedServer(Netty, port = 49761, "0.0.0.0") {
 
         intercept(ApplicationCallPipeline.Plugins) {
             Log.i(TAG, "Intercept block started")
@@ -177,117 +181,107 @@ class DefaultHttpService : Service() {
         routing {
 
             get("/{...}") {
+
                 var requestPath = call.request.path().substring(1)
 
-                    val cookieToken = call.request.cookies["auth_token"]
+                val cookieToken = call.request.cookies["auth_token"]
 
-                    //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
-                    if (cookieToken == null) {
+                //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
+                if (cookieToken == null) {
 
+                    val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
+                    Log.i(TAG, "fileExtension:  $fileExtension")
 
-                        val assetManager = applicationContext.assets
-                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
-                        if (requestPath.isEmpty()) {
-                            Log.i(TAG, "auth-login-default.html için if bloğuna girdi")
-                            val authContent = assetManager.open("auth-login-default.html").use { it.readBytes() }
-                            call.respondBytes(authContent, ContentType.Text.Html)
+                    if (fileExtension == "html" || fileExtension.isEmpty()) {
+                        // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR
+                        val authContent = applicationContext.assets.open("auth-login-default.html")
+                            .use { it.readBytes() }
+                        call.respondBytes(authContent, ContentType.Text.Html)
+                        return@get
+                    } else {
+                        // JS, CSS, resim vb. için
+                        try {
+                            requestPath = requestPath.split("/").last()
+                            Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
+
+                            val contentType = getContentType(File(requestPath))
+                            val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
+                            call.respondBytes(fileContent, contentType)
                             return@get
-                        }else{
-                            try {
-                                // assets klasöründe bu dosya var mı kontrol et
-                                requestPath.split("-").last()
-                                Log.i(TAG, "auth-login-default.html için ELSE bloğuna girdi requestPath: " + requestPath)
-
-                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
-
-                                // Dosyanın içeriğini doğrudan bayt olarak oku
-                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
-                                // İçeriği yanıt olarak gönder
-                                call.respondBytes(fileContent, contentType)
-
-                                return@get
-                            } catch (e: IOException) {
-                                Log.e(TAG, "DOSYA BULAMADI")
-                                // Dosya bulunamadıysa bu bloğa girecektir.
-                            }
+                        } catch (e: IOException) {
+                            // Dosya bulunamazsa hata logu
+                            Log.e(TAG, "COOKIE NULL BLOĞUNDA DOSYA BULAMADI")
                         }
+                    }
+                }
 
+                try {
+                    JWT.require(Algorithm.HMAC256(jwtSecret))
+                        .withIssuer(jwtIssuer)
+                        .build()
+                        .verify(cookieToken)
+                    //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA DEFAULT SERVER ANA SAYFASINI GÖSTER (API)
+                    Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
 
+                    val assetManager = applicationContext.assets
+
+                    if (requestPath.isEmpty()) {
+
+                        Log.i(TAG, "TOKEN ARTIK DOĞRU, GİRİŞ SAYFASI YERİNE ANA SAYFAYI GÖSTER")
+                        val authContent =
+                            assetManager.open("DefaultServerWeb/default-server-main.html")
+                                .use { it.readBytes() }
+                        call.respondBytes(authContent, ContentType.Text.Html)
+                        return@get
+                    } else {
+                        try {
+
+                            //BU SERVİSTE TÜM DOSYALAR DefaultServerWeb KLASÖRÜ İÇERİSİNDE OLACAĞI İÇİN KLASÖR İSMİNİ BAŞA EKLİYORUZ
+                            requestPath = "DefaultServerWeb/" + requestPath
+                            Log.i(TAG, "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath)
+
+                            val contentType = getContentType(File(requestPath))
+
+                            val fileContent = assetManager.open(requestPath).use { it.readBytes() }
+
+                            call.respondBytes(fileContent, contentType)
+                            return@get
+                        } catch (e: IOException) {
+                            Log.e(TAG, "DOSYA BULAMADI")
+                            // Dosya bulunamadıysa bu bloğa girecektir.
+                        }
                     }
 
-                    try {
-                        JWT.require(Algorithm.HMAC256(jwtSecret))
-                            .withIssuer(jwtIssuer)
-                            .build()
-                            .verify(cookieToken)
-//TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA DEFAULT SERVER İLE İLGİLİ SİTEYİ GÖSTER (API)
-                        Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
 
-                        val assetManager = applicationContext.assets
-                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
-                        if (requestPath.isEmpty()) {
-                            Log.i(TAG, "herhangi bir link yok direkt ana sayfaya yönlendir")
-                            val authContent = assetManager.open("DefaultServerWeb/default-server-main.html").use { it.readBytes() }
-                            call.respondBytes(authContent, ContentType.Text.Html)
+                } catch (e: JWTVerificationException) {
+                    //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
+                    Log.e(TAG, "TOKEN VERİFİCATİON ERROR: ")
+                    e.message
+                    val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
+                    Log.i(TAG, "fileExtension:  $fileExtension")
+
+                    if (fileExtension == "html" || fileExtension.isEmpty()) {
+                        // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR
+                        val authContent = applicationContext.assets.open("auth-login-default.html")
+                            .use { it.readBytes() }
+                        call.respondBytes(authContent, ContentType.Text.Html)
+                        return@get
+                    } else {
+                        // JS, CSS, resim vb. için
+                        try {
+                            requestPath = requestPath.split("/").last()
+                            Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
+
+                            val contentType = getContentType(File(requestPath))
+                            val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
+                            call.respondBytes(fileContent, contentType)
                             return@get
-                        }else{
-                            try {
-                                // assets klasöründe bu dosya var mı kontrol et
-                                requestPath.split("-").last()
-
-                                requestPath = "DefaultServerWeb/" + requestPath
-                                Log.i(TAG, "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath)
-
-                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
-
-                                // Dosyanın içeriğini doğrudan bayt olarak oku
-                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
-                                // İçeriği yanıt olarak gönder
-                                call.respondBytes(fileContent, contentType)
-
-                                return@get
-                            } catch (e: IOException) {
-                                Log.e(TAG, "DOSYA BULAMADI")
-                                // Dosya bulunamadıysa bu bloğa girecektir.
-                            }
+                        } catch (e: IOException) {
+                            // Dosya bulunamazsa hata logu
+                            Log.e(TAG, "COOKIE NULL BLOĞUNDA DOSYA BULAMADI")
                         }
-
-
-                    } catch (e: JWTVerificationException) {
-
-                        //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
-                        val assetManager = applicationContext.assets
-                        Log.i(TAG, "İLK REQUESTPATH: " + requestPath)
-                        if (requestPath.isEmpty()) {
-                            Log.i(TAG, "auth-login-default.html için if bloğuna girdi")
-                            val authContent = assetManager.open("auth-login-default.html").use { it.readBytes() }
-                            call.respondBytes(authContent, ContentType.Text.Html)
-                            return@get
-                        }else{
-                            try {
-                                // assets klasöründe bu dosya var mı kontrol et
-                                requestPath.split("-").last()
-                                Log.i(TAG, "auth-login-default.html için ELSE bloğuna girdi requestPath: " + requestPath)
-
-                                val contentType = getContentType(File(requestPath)) // İçerik türünü al
-
-                                // Dosyanın içeriğini doğrudan bayt olarak oku
-                                val fileContent = assetManager.open(requestPath).use { it.readBytes() }
-
-                                // İçeriği yanıt olarak gönder
-                                call.respondBytes(fileContent, contentType)
-
-                                return@get
-                            } catch (e: IOException) {
-                                Log.e(TAG, "DOSYA BULAMADI")
-                                // Dosya bulunamadıysa bu bloğa girecektir.
-                            }
-                        }
-
-
                     }
+                }
             }
 
 
@@ -295,82 +289,114 @@ class DefaultHttpService : Service() {
             authenticate("auth-jwt") {
                 post("/postWebFolders") {
 
-                     try {
-                         val multipart = call.receiveMultipart()
-                         var folderName: String? = null
-                         val appSpecificExternalDir = ContextCompat.getExternalFilesDirs(applicationContext, null)[0]
+                    try {
+                        val multipart = call.receiveMultipart()
+                        var folderName: String? = null
+                        val appSpecificExternalDir =
+                            ContextCompat.getExternalFilesDirs(applicationContext, null)[0]
 
-                         val parts = multipart.readAllParts() // Bu, tüm parçaları bir listeye alacak
-                         val relativePaths = mutableListOf<String>()
+                        val parts = multipart.readAllParts() // Bu, tüm parçaları bir listeye alacak
+                        val relativePaths = mutableListOf<String>()
 
-                         for (part in parts) {
-                             when (part) {
-                                 is PartData.FileItem -> {
-                                     val ext = File(part.originalFileName!!).extension
-                                     val fileBytes = part.streamProvider().readBytes()
+                        for (part in parts) {
+                            when (part) {
+                                is PartData.FileItem -> {
+                                    val ext = File(part.originalFileName!!).extension
+                                    val fileBytes = part.streamProvider().readBytes()
 
-                                     if (folderName == null) {
-                                         call.respond(HttpStatusCode.BadRequest, ErrorResponse(21001, "folderName is missing"))
-                                         return@post
-                                     }
+                                    if (folderName == null) {
+                                        call.respond(
+                                            HttpStatusCode.BadRequest,
+                                            ErrorResponse(21001, "folderName is missing")
+                                        )
+                                        return@post
+                                    }
 
-                                     val basePath = File(applicationContext.getExternalFilesDir(null), folderName)
+                                    val basePath = File(
+                                        applicationContext.getExternalFilesDir(null),
+                                        folderName
+                                    )
 
-                                     // İlgili yolu al
-                                     val relativePath = relativePaths.removeAt(0) // İlk elemanı al ve kaldır
+                                    // İlgili yolu al
+                                    val relativePath =
+                                        relativePaths.removeAt(0) // İlk elemanı al ve kaldır
 
-                                     // Ana klasör ismini yoldan çıkar
-                                     val cleanedPath = relativePath.replace("$folderName/", "")
+                                    // Ana klasör ismini yoldan çıkar
+                                    val cleanedPath = relativePath.replace("$folderName/", "")
 
-                                     val fullPath = File(basePath, cleanedPath)
+                                    val fullPath = File(basePath, cleanedPath)
 
-                                     if (!fullPath.parentFile.exists()) {
-                                         if (!fullPath.parentFile.mkdirs()) {
-                                             Log.i(TAG, "Failed to create directory: ${fullPath.parentFile}")
-                                             call.respond(HttpStatusCode.InternalServerError, ErrorResponse(21002, "Failed to create directory"))
-                                             return@post
-                                         }
-                                     }
+                                    if (!fullPath.parentFile.exists()) {
+                                        if (!fullPath.parentFile.mkdirs()) {
+                                            Log.i(
+                                                TAG,
+                                                "Failed to create directory: ${fullPath.parentFile}"
+                                            )
+                                            call.respond(
+                                                HttpStatusCode.InternalServerError,
+                                                ErrorResponse(21002, "Failed to create directory")
+                                            )
+                                            return@post
+                                        }
+                                    }
 
-                                     fullPath.writeBytes(fileBytes)
+                                    fullPath.writeBytes(fileBytes)
 
-                                 }
-                                 is PartData.FormItem -> {
-                                     if (part.name == "folderName") {
-                                         folderName = part.value
-                                         Log.i(TAG, "/postWebFolders folderName: $folderName")
-                                     } else if (part.name == "filePaths[]") {
-                                         relativePaths.add(part.value)
-                                     }
+                                }
 
-                                 }
-                                 else -> {}
-                             }
-                             part.dispose()
-                         }
+                                is PartData.FormItem -> {
+                                    if (part.name == "folderName") {
+                                        folderName = part.value
+                                        Log.i(TAG, "/postWebFolders folderName: $folderName")
+                                    } else if (part.name == "filePaths[]") {
+                                        relativePaths.add(part.value)
+                                    }
 
-                         if (folderName == null) {
-                             call.respond(HttpStatusCode.BadRequest, ErrorResponse(21001, "folderName is missing"))
-                             return@post
-                         }
+                                }
+
+                                else -> {}
+                            }
+                            part.dispose()
+                        }
+
+                        if (folderName == null) {
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                ErrorResponse(21001, "folderName is missing")
+                            )
+                            return@post
+                        }
 
 
-                         val database = AppDatabase.getDatabase(applicationContext)
-                         val dao = database.folderDao()
-                         val totalData = dao.getAll().size
-                         val isSelected = totalData == 0
-                         Log.i(TAG, " totalData == 0: " + (totalData == 0) + " isSelected: " + isSelected + " totalData:  " + totalData)
-                         val customServerFolders = CustomServerFolders(id = 0, folderName = folderName, isSelected = isSelected)
-                         dao.insert(customServerFolders)
+                        val database = AppDatabase.getDatabase(applicationContext)
+                        val dao = database.folderDao()
+                        val totalData = dao.getAll().size
+                        val isSelected = totalData == 0
+                        Log.i(
+                            TAG,
+                            " totalData == 0: " + (totalData == 0) + " isSelected: " + isSelected + " totalData:  " + totalData
+                        )
+                        val customServerFolders = CustomServerFolders(
+                            id = 0,
+                            folderName = folderName,
+                            isSelected = isSelected
+                        )
+                        dao.insert(customServerFolders)
 
-                         Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
-                         call.respond(HttpStatusCode.OK, mapOf("message" to "Files uploaded successfully"))
+                        Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
+                        call.respond(
+                            HttpStatusCode.OK,
+                            mapOf("message" to "Files uploaded successfully")
+                        )
 
-                     } catch (e: Exception) {
-                         Log.i(TAG, "/postWebFolders ERROR: ")
-                         e.printStackTrace()
-                         call.respond(HttpStatusCode.BadRequest, ErrorResponse(21003, "Internal Server Error"))
-                     }
+                    } catch (e: Exception) {
+                        Log.i(TAG, "/postWebFolders ERROR: ")
+                        e.printStackTrace()
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(21003, "Internal Server Error")
+                        )
+                    }
                 }
             }
 
@@ -389,16 +415,26 @@ class DefaultHttpService : Service() {
                     Log.i(TAG, "Received data in /postAuthPassword -> : $requestData")
 
                     // Gson ile JSON'dan haritaya dönüşüm yap
-                    val data: Map<String, String> = Gson().fromJson(requestData, Map::class.java) as Map<String, String>
+                    val data: Map<String, String> =
+                        Gson().fromJson(requestData, Map::class.java) as Map<String, String>
                     val clientPassword = data["password"]
 
-                    val serverPasswordEncrypted = sha256(DefaultServerData.defaultServerAuthPassword.toString())  // sunucudaki şifreyi şifreleyin
+                    val serverPasswordEncrypted =
+                        sha256(DefaultServerData.defaultServerAuthPassword.toString())  // sunucudaki şifreyi şifreleyin
 
                     if (clientPassword == serverPasswordEncrypted) {
                         // Şifre doğru
                         Log.i(TAG, "Şifre Doğru")
                         val token = makeToken()
-                        call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
+                        call.response.cookies.append(
+                            Cookie(
+                                "auth_token",
+                                token,
+                                path = "/",
+                                httpOnly = true,
+                                maxAge = 3600
+                            )
+                        ) // 1 saat
                         call.respond(ResponseDto(true, token))
                     } else {
                         // Şifre yanlış
@@ -407,7 +443,10 @@ class DefaultHttpService : Service() {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "postAuthPassword HATA : ", e)
-                    call.respond(HttpStatusCode.Forbidden, mapOf("password_status" to "Failed to process request"))
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        mapOf("password_status" to "Failed to process request")
+                    )
                 }
             }
         }
@@ -423,7 +462,8 @@ class DefaultHttpService : Service() {
     override fun onDestroy() {
         server.stop(1000, 5000)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(2)
 
         Log.i(TAG, "onDestroy() ->")

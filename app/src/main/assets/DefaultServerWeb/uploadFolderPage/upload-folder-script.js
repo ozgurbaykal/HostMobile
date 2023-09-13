@@ -1,3 +1,32 @@
+document.addEventListener("DOMContentLoaded", function(){
+    var httpLink = "http://" + location.host + "/getCurrentFolderData";
+
+    fetch(httpLink, {
+        method: 'GET',
+    })
+    .then(response => {
+    return response.json();
+    })
+    .then(data => {
+        console.log(data.selected_folder + "  " + data.selected_starter_page)
+
+        if(data.selected_folder != undefined)
+            document.getElementById("selectedFolderSpan").textContent = data.selected_folder;
+        else
+            document.getElementById("selectedFolderSpan").textContent = "NONE";
+
+        if(data.selected_starter_page != undefined)
+            document.getElementById("selectedStarterPageSpan").textContent = data.selected_starter_page;
+        else
+            document.getElementById("selectedStarterPageSpan").textContent = "NONE.HTML";
+
+    })
+    .catch(error => {
+        document.getElementById("selectedFolderSpan").textContent = "NONE";
+        document.getElementById("selectedStarterPageSpan").textContent = "NONE.HTML";
+    });
+});
+
 function handleFolderSelection(event) {
     const files = event.target.files;
     const folderData = new FormData();

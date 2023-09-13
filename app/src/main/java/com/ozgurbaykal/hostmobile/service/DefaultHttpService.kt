@@ -406,13 +406,6 @@ class DefaultHttpService : Service() {
 
 
 
-
-
-
-
-
-
-
             post("/postAuthPassword") {
                 try {
                     val requestData = call.receiveText()
@@ -453,6 +446,30 @@ class DefaultHttpService : Service() {
                     )
                 }
             }
+
+
+            //ROUTE CODE 03
+            authenticate ("auth-jwt"){
+                get ("/getCurrentFolderData"){
+                    val database = AppDatabase.getDatabase(applicationContext)
+                    val dao = database.folderDao()
+                    val folderNames = dao.getSelectedFolder()
+
+                    if(folderNames != null){
+                        call.respond(
+                            HttpStatusCode.OK,
+                            mapOf("selected_folder" to folderNames.folderName, "selected_starter_page" to folderNames.selectedFile)
+                        )
+                    }else{
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(31001, "Can't find any selected folder and starter page.")
+                        )
+                    }
+                }
+            }
+
+
         }
         Log.i(TAG, "server() ->")
     }

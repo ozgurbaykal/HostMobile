@@ -21,9 +21,9 @@
 </div>
 
 <div class="selected-info" style="margin-bottom: 50px; padding: 20px 75px; border: 2px solid #6a6a6a71;">
-    <span style="margin-right: 10px; color: white;">Selected folder is</span> <span style="color: #de614b;">.......</span>
+    <span style="margin-right: 10px; color: white;">Current selected folder is</span> <span style="color: #de614b;" id="selectedFolderSpan">.......</span>
     <br>
-    <span style="margin-right: 10px; color: white;">Selected starter page is</span> <span style="color: #de614b;">.......</span>
+    <span style="margin-right: 10px; color: white;">Current selected starter page is</span> <span style="color: #de614b;" id="selectedStarterPageSpan">.......</span>
 </div>
 <input type="file" id="folderUploader" webkitdirectory style="display: none;" onchange="handleFolderSelection(event)">
 
@@ -37,4 +37,5 @@
 </body>
 <script src="upload-folder-script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
 </html>

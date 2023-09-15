@@ -127,6 +127,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
             customServerPortEditText.setText(SharedPreferenceManager.readInteger("customServerPort", -1).toString())
             Log.i(TAG, " customServerPort from preference: " + SharedPreferenceManager.readInteger("customServerPort", -1).toString())
+        }else if(controller.customServerPort != 0){
+            customServerPortEditText.setText(controller.customServerPort.toString())
         }
 
         customServerPortEditText.addTextChangedListener(object : TextWatcher {

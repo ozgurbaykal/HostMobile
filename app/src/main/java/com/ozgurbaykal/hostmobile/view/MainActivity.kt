@@ -84,10 +84,6 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                 openServerButton.text = "Server(s) Running  -  STOP"
                 val colorStateList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.custom_blue))
                 openServerButton.backgroundTintList = colorStateList
-
-
-            }else{
-                SharedPreferenceManager.writeInteger("customServerPort", -1)
             }
 
             openServerButton.setOnClickListener {

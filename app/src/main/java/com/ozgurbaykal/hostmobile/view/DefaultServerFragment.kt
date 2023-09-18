@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -14,9 +15,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
+import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.FragmentDefaultServerBinding
+import com.ozgurbaykal.hostmobile.service.CustomHttpService
 import com.ozgurbaykal.hostmobile.service.CustomServerData
+import com.ozgurbaykal.hostmobile.service.DefaultHttpService
 import com.ozgurbaykal.hostmobile.service.DefaultServerData
+import com.ozgurbaykal.hostmobile.service.ServiceUtils
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.random.Random
@@ -36,6 +41,7 @@ class DefaultServerFragment : Fragment(R.layout.fragment_default_server) {
     private lateinit var authCodeText : TextView
     private lateinit var authCodeProgress : ProgressBar
     private lateinit var authRandomCodeLinear : LinearLayout
+    private lateinit var refreshIcon : ImageView
 
     private var timer: Timer? = null
 
@@ -56,6 +62,7 @@ class DefaultServerFragment : Fragment(R.layout.fragment_default_server) {
         authCodeText = binding.authCodeText
         authCodeProgress = binding.authCodeProgress
         authRandomCodeLinear = binding.authRandomCodeLinear
+        refreshIcon = binding.refreshIcon
 
         localIpEditText.setText(CustomLocalAddress.getIpAddress(requireContext()))
 
@@ -68,7 +75,41 @@ class DefaultServerFragment : Fragment(R.layout.fragment_default_server) {
                 dropDownLinear.visibility = View.VISIBLE
         }
 
+        refreshIcon.setOnClickListener {
+            authCodeText.visibility = View.VISIBLE
+            refreshIcon.visibility = View.GONE
+            startAuthCodeProcess()
+        }
+
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i(TAG, "onResume()")
+
+        val isDefaultServerRunning = ServiceUtils.isServiceRunning(requireContext(), DefaultHttpService::class.java)
+
+        if(isDefaultServerRunning){
+            authRandomCodeLinear.visibility = View.VISIBLE
+            refreshIcon.visibility = View.VISIBLE
+            authCodeText.visibility = View.GONE
+        }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i(TAG, "onPause()")
+
+        val isDefaultServerRunning = ServiceUtils.isServiceRunning(requireContext(), CustomHttpService::class.java)
+
+        if(isDefaultServerRunning){
+            stopAuthCodeProcess()
+            refreshIcon.visibility = View.VISIBLE
+            authCodeText.visibility = View.GONE
+        }
+
     }
 
     fun startAuthCodeProcess() {

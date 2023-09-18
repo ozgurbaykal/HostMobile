@@ -81,6 +81,7 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
     private lateinit var authCodeText : TextView
     private lateinit var authCodeProgress : ProgressBar
     private lateinit var authRandomCodeLinear : LinearLayout
+    private lateinit var refreshIcon : ImageView
 
     private var timer: Timer? = null
 
@@ -121,6 +122,7 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         authCodeText = binding.authCodeText
         authCodeProgress = binding.authCodeProgress
         authRandomCodeLinear = binding.authRandomCodeLinear
+        refreshIcon = binding.refreshIcon
 
 
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
@@ -197,6 +199,11 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
             customDialogManager.showCustomDialog()
         }
 
+        refreshIcon.setOnClickListener {
+            authCodeText.visibility = View.VISIBLE
+            refreshIcon.visibility = View.GONE
+            startAuthCodeProcess()
+        }
 
         folderViewModel = ViewModelProvider(this).get(FolderViewModel::class.java)
 
@@ -236,8 +243,36 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.i(TAG, "onResume()")
+
+        val isCustomServerRunning = ServiceUtils.isServiceRunning(requireContext(), CustomHttpService::class.java)
+
+        if(isCustomServerRunning && SharedPreferenceManager.readBoolean("customServerAuthBoolean", false) == true){
+            authRandomCodeLinear.visibility = View.VISIBLE
+            refreshIcon.visibility = View.VISIBLE
+            authCodeText.visibility = View.GONE
+        }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.i(TAG, "onPause()")
+
+        val isCustomServerRunning = ServiceUtils.isServiceRunning(requireContext(), CustomHttpService::class.java)
+
+        if(isCustomServerRunning && SharedPreferenceManager.readBoolean("customServerAuthBoolean", false) == true){
+            stopAuthCodeProcess()
+            refreshIcon.visibility = View.VISIBLE
+            authCodeText.visibility = View.GONE
+        }
+
+    }
 
      fun startAuthCodeProcess() {
+         Log.i(TAG, " startAuthCodeProcess()")
         stopAuthCodeProcess() // Eğer bir timer zaten çalışıyorsa durdur
 
          generateAndSetAuthCode()
@@ -262,6 +297,7 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
     }
 
      fun stopAuthCodeProcess() {
+         Log.i(TAG, " stopAuthCodeProcess()")
         timer?.cancel()
         timer = null
         authCodeProgress.progress = 0
@@ -271,6 +307,7 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
     private fun generateAndSetAuthCode() {
         val randomCode = Random.nextInt(1000, 9999)
+        Log.i(TAG, " generateAndSetAuthCode() -> randomCode: $randomCode")
         CustomServerData.customServerAuthPassword = randomCode
         authCodeText.text = randomCode.toString()
     }

@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -39,6 +40,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 
 class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessStarter{
@@ -208,6 +213,8 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                 }
                 R.id.page_3_bottom_nav_button -> {
                     Log.i(TAG, "Bottom Nav ClickEvent -> PAGE 3")
+                    changeFragment(LogFragment(), R.id.main_fragment_view, "LogFragmentTag")
+
                     return@setOnItemSelectedListener true
                 }
                 R.id.page_4_bottom_nav_button -> {
@@ -254,6 +261,24 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+    }
+
+
+    fun getCurrentTime(): String {
+        val calendar = Calendar.getInstance()
+        val format = SimpleDateFormat("HH:mm:ss")
+        return format.format(calendar.time)
+    }
+
+    fun addLogFromInstance(message: String, color: Int, firstLog: Boolean){
+        try {
+            val findLogFragment = supportFragmentManager.findFragmentByTag("LogFragmentTag") as LogFragment
+            findLogFragment.addLog(message, color, firstLog)
+        }catch (e: Exception){
+            Log.e(TAG, " LogFragment cant find addLog get error")
+            e.message
+        }
+
     }
     private fun createCustomServerFilesDirectory(path: String) {
 

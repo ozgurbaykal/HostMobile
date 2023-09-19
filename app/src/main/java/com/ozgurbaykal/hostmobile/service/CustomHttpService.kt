@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -17,6 +18,9 @@ import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.model.AppDatabase
+import com.ozgurbaykal.hostmobile.view.DefaultServerFragment
+import com.ozgurbaykal.hostmobile.view.LogFragment
+import com.ozgurbaykal.hostmobile.view.MainActivity
 import io.ktor.http.ContentType
 import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
@@ -163,6 +167,8 @@ class CustomHttpService : Service() {
 
                         val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
                         Log.i(TAG, "fileExtension:  $fileExtension")
+
+                        MainActivity.getInstance()?.addLogFromInstance("${MainActivity.getInstance()?.getCurrentTime()}   Requst ->  $requestPath", Color.WHITE, false)
 
                         if (fileExtension == "html" || fileExtension.isEmpty()) {
                             // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR

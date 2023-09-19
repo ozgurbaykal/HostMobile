@@ -24,6 +24,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
 import com.ozgurbaykal.hostmobile.control.CustomServerController
+import com.ozgurbaykal.hostmobile.control.DefaultServerSharedPreferenceManager
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.databinding.ActivityMainBinding
 import com.ozgurbaykal.hostmobile.model.AppDatabase
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
         setContentView(view)
 
             SharedPreferenceManager.init(this@MainActivity)
+            DefaultServerSharedPreferenceManager.init(this@MainActivity)
 
             //IF APP OPEN FIRST TIME, SHOW TUTORIAL
             if(SharedPreferenceManager.readBoolean("isNewUser", true) == true){

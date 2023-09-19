@@ -61,7 +61,10 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.util.Date
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.ozgurbaykal.hostmobile.control.DefaultServerSharedPreferenceManager
 import com.ozgurbaykal.hostmobile.view.MainActivity
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.request.receive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -493,6 +496,65 @@ class DefaultHttpService : Service() {
                 }
             }
 
+            authenticate ("auth-jwt"){
+                //ROUTE CODE 04
+                post ("/sharedpreference/write/string"){
+
+                    try {
+                        val requestData = call.receive<PreferenceDataString>()
+                        Log.i(TAG, "key: ${requestData.key} , stringValue: ${requestData.stringValue}")
+
+                        DefaultServerSharedPreferenceManager.writeString(requestData.key, requestData.stringValue)
+
+                        call.respond(HttpStatusCode.OK, "SharedPreference saved.")
+                    }catch (e: Exception) {
+                        when(e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(51001, "Deserialization error. Check the format of your request data.")
+                                )
+                            }
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(51002, "Internal server error. Please try again later.")
+                                )
+                            }
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(51003, "Something unexpected happened on the server.")
+                                )
+                            }
+                    }
+                    }
+                }
+
+                //ROUTE CODE 05
+                get ("/sharedpreference/read/string"){
+
+                    val key = call.parameters["key"]
+                    val defaultStringValue = call.parameters["defaultStringValue"]
+
+                    if (key != null && defaultStringValue != null) {
+                        Log.i(TAG, "KEY: $key")
+
+                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readString(key, defaultStringValue).toString())
+
+                    } else {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(51001, "Please send all parameters. key -> Your data key.  ---  defaultStringValue -> If data is null return default value.")
+                        )
+                    }
+                }
+
+            }
+
 
         }
         Log.i(TAG, "server() ->")
@@ -514,7 +576,7 @@ class DefaultHttpService : Service() {
         notificationManager.cancel(2)
 
         Log.i(TAG, "onDestroy() ->")
-        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()} DefaultServer is stopped.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()} Default is stopped.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
 
         super.onDestroy()
     }
@@ -535,5 +597,7 @@ class DefaultHttpService : Service() {
 
     @Serializable
     data class ErrorResponse(val error_code: Int, val message: String)
+    @Serializable
+    data class PreferenceDataString(val key: String, val stringValue: String)
 
 }

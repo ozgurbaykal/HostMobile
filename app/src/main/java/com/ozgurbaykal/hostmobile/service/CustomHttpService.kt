@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
@@ -164,11 +165,12 @@ class CustomHttpService : Service() {
 
                     //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
                     if (cookieToken == null) {
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is null in the request to the server. Redirect to home page. ", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
 
                         val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
                         Log.i(TAG, "fileExtension:  $fileExtension")
 
-                        MainActivity.getInstance()?.addLogFromInstance("${MainActivity.getInstance()?.getCurrentTime()}   Requst ->  $requestPath", Color.WHITE, false)
 
                         if (fileExtension == "html" || fileExtension.isEmpty()) {
                             // COKKIE NULL OLDUĞU İÇİN GİRİŞ SAYFASINA YÖNLENDİR
@@ -200,6 +202,8 @@ class CustomHttpService : Service() {
                             .build()
                             .verify(cookieToken)
                         //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA KULLANICININ SEÇTİĞİ WEB SİTESİNİ ARTIK GÖSTER
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is true.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
 
                         val dao = db.folderDao()
                         val folder = dao.getSelectedFolder()
@@ -229,6 +233,9 @@ class CustomHttpService : Service() {
                         }
 
                     } catch (e: JWTVerificationException) {
+
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   Can't verify JWT token, redirect to home page.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
 
                         //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
                         val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
@@ -272,6 +279,8 @@ class CustomHttpService : Service() {
                     // Dosyanın tam yolu, seçili klasör yolu ile istek yolu birleştirilerek oluşturulur.
                     var fullPath = folderPath + File.separator + requestPath
 
+                    MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+
                     if(requestPath.isEmpty())
                         fullPath = folder?.selectedFilePath.toString()
 
@@ -299,6 +308,8 @@ class CustomHttpService : Service() {
                     val requestData = call.receiveText()
                     Log.i(TAG, "Received data in /postAuthPassword -> : $requestData")
 
+                    MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   POST AUTH PASSWORD REQUEST", Color.WHITE, false)
+
                     // Gson ile JSON'dan haritaya dönüşüm yap
                     val data: Map<String, String> = Gson().fromJson(requestData, Map::class.java) as Map<String, String>
                     val clientPassword = data["password"]
@@ -308,12 +319,15 @@ class CustomHttpService : Service() {
                     if (clientPassword == serverPasswordEncrypted) {
                         // Şifre doğru
                         Log.i(TAG, "Şifre Doğru")
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> CORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
                         val token = makeToken()
                         call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
                         call.respond(ResponseDto(true, token))
                     } else {
                         // Şifre yanlış
                         Log.i(TAG, "Şifre yanlış")
+                        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> INCORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+
                         call.respond(ResponseDto(false))
                     }
                 } catch (e: Exception) {
@@ -329,12 +343,15 @@ class CustomHttpService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         server.start(wait = false)
         Log.i(TAG, "onStartCommand() -> PORT: " + CustomServerController.customServerPort)
+        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()} CustomServer is started.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
         server.stop(1000, 5000)
         Log.i(TAG, "onDestroy() ->")
+        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()} CustomServer is stopped.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(1)

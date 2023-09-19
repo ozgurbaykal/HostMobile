@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.databinding.FragmentLogBinding
@@ -78,6 +79,8 @@ class LogFragment : Fragment(R.layout.fragment_log) {
     fun addLog(message: String, color: Int, firstLog: Boolean) {
             val item = LogItem(message, color)
             logItems.add(item)
+            //val addNewLineText = LogItem("-----------------------------------", ContextCompat.getColor(requireContext(), R.color.custom_gray))
+            //logItems.add(addNewLineText)
             updateLogScreen(firstLog)
     }
 

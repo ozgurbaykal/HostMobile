@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Environment
 import android.os.IBinder
 import android.util.Log
@@ -60,6 +61,7 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.util.Date
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.ozgurbaykal.hostmobile.view.MainActivity
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -187,6 +189,8 @@ class DefaultHttpService : Service() {
 
                 //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
                 if (cookieToken == null) {
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is null in the request to the server. Redirect to home page. ", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
 
                     val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
                     Log.i(TAG, "fileExtension:  $fileExtension")
@@ -222,6 +226,9 @@ class DefaultHttpService : Service() {
                     //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA DEFAULT SERVER ANA SAYFASINI GÖSTER (API)
                     Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
 
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is true.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+
                     val assetManager = applicationContext.assets
 
                     if (requestPath.isEmpty()) {
@@ -256,6 +263,10 @@ class DefaultHttpService : Service() {
 
 
                 } catch (e: JWTVerificationException) {
+
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Can't verify JWT token, redirect to home page.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+
                     //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
                     Log.e(TAG, "TOKEN VERİFİCATİON ERROR: ")
                     e.message
@@ -290,6 +301,7 @@ class DefaultHttpService : Service() {
             //ROUTE CODE 02
             authenticate("auth-jwt") {
                 post("/postWebFolders") {
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   POST WEB FOLDERS REQUEST", Color.WHITE, false)
 
                     try {
                         val multipart = call.receiveMultipart()
@@ -311,6 +323,7 @@ class DefaultHttpService : Service() {
                                             HttpStatusCode.BadRequest,
                                             ErrorResponse(21001, "folderName is missing")
                                         )
+                                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> folderName is missing in request", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
                                         return@post
                                     }
 
@@ -338,6 +351,7 @@ class DefaultHttpService : Service() {
                                                 HttpStatusCode.InternalServerError,
                                                 ErrorResponse(21002, "Failed to create directory")
                                             )
+                                            MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Failed to create directory", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
                                             return@post
                                         }
                                     }
@@ -366,6 +380,7 @@ class DefaultHttpService : Service() {
                                 HttpStatusCode.BadRequest,
                                 ErrorResponse(21001, "folderName is missing")
                             )
+                            MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> folderName is missing in request", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
                             return@post
                         }
 
@@ -392,9 +407,11 @@ class DefaultHttpService : Service() {
                             HttpStatusCode.OK,
                             mapOf("message" to "Files uploaded successfully")
                         )
+                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Files retrieved successfully", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
 
                     } catch (e: Exception) {
                         Log.i(TAG, "/postWebFolders ERROR: ")
+                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Something happened", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
                         e.printStackTrace()
                         call.respond(
                             HttpStatusCode.BadRequest,
@@ -411,6 +428,8 @@ class DefaultHttpService : Service() {
                     val requestData = call.receiveText()
                     Log.i(TAG, "Received data in /postAuthPassword -> : $requestData")
 
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   POST AUTH PASSWORD REQUEST", Color.WHITE, false)
+
                     // Gson ile JSON'dan haritaya dönüşüm yap
                     val data: Map<String, String> =
                         Gson().fromJson(requestData, Map::class.java) as Map<String, String>
@@ -422,6 +441,7 @@ class DefaultHttpService : Service() {
                     if (clientPassword == serverPasswordEncrypted) {
                         // Şifre doğru
                         Log.i(TAG, "Şifre Doğru")
+                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> CORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
                         val token = makeToken()
                         call.response.cookies.append(
                             Cookie(
@@ -436,6 +456,8 @@ class DefaultHttpService : Service() {
                     } else {
                         // Şifre yanlış
                         Log.i(TAG, "Şifre yanlış")
+                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> INCORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+
                         call.respond(ResponseDto(false))
                     }
                 } catch (e: Exception) {
@@ -451,6 +473,8 @@ class DefaultHttpService : Service() {
             //ROUTE CODE 03
             authenticate ("auth-jwt"){
                 get ("/getCurrentFolderData"){
+                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   GET (/getCurrentFolderData) REQUEST", Color.WHITE, false)
+
                     val database = AppDatabase.getDatabase(applicationContext)
                     val dao = database.folderDao()
                     val folderNames = dao.getSelectedFolder()
@@ -477,6 +501,8 @@ class DefaultHttpService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         server.start(wait = false)
         Log.i(TAG, "onStartCommand() -> ")
+        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()} DefaultServer is started.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -488,6 +514,8 @@ class DefaultHttpService : Service() {
         notificationManager.cancel(2)
 
         Log.i(TAG, "onDestroy() ->")
+        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()} DefaultServer is stopped.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+
         super.onDestroy()
     }
 

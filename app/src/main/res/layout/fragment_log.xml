@@ -19,6 +19,14 @@
         android:textColor="@color/white"
         android:text="CLEAR LOG"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CS -> CustomServer     DS -> DefaultServer"
+        android:textAlignment="center"
+        android:textColor="@color/custom_gray"
+        android:textSize="15sp"/>
+
     <ScrollView
         android:id="@+id/logTextScroll"
         android:layout_width="match_parent"
@@ -30,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@color/white"
-            android:textSize="20dp"/>
+            android:text="Nothing to see"
+            android:textSize="15sp"/>
 
     </ScrollView>
 

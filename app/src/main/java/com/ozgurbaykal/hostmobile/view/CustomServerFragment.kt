@@ -128,6 +128,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         if(SharedPreferenceManager.readInteger("customServerPort", -1) != -1){
 
             customServerPortEditText.setText(SharedPreferenceManager.readInteger("customServerPort", -1).toString())
+            CustomServerController.customServerPort = SharedPreferenceManager.readInteger("customServerPort", 0)!!
+
             Log.i(TAG, " customServerPort from preference: " + SharedPreferenceManager.readInteger("customServerPort", -1).toString())
         }else if(controller.customServerPort != 0){
             customServerPortEditText.setText(controller.customServerPort.toString())

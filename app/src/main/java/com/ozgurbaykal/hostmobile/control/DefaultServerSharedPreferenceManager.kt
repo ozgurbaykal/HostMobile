@@ -46,4 +46,10 @@ object DefaultServerSharedPreferenceManager {
         editor?.remove(key)
         editor?.apply()
     }
+
+    fun removeAll() {
+        val editor = sharedPreferences?.edit()
+        editor?.clear()
+        editor?.apply()
+    }
 }

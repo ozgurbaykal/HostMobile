@@ -699,6 +699,12 @@ class DefaultHttpService : Service() {
                     }
 
                 }
+
+                delete("/sharedpreference/remove/all") {
+                        DefaultServerSharedPreferenceManager.removeAll()
+
+                        call.respond(HttpStatusCode.OK, "All SharedPreference removed.")
+                }
             }
 
         }

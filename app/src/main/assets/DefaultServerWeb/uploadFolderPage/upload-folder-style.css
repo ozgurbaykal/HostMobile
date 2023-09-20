@@ -43,3 +43,13 @@ body {
 .option:hover {
     border: 2px solid #0E7DE3;
 }
+
+.home-icon {
+    position: absolute;
+    top: 10px;  /* Üstten 10 piksel boşlukla */
+    left: 10px; /* Soldan 10 piksel boşlukla */
+    width: 128px; /* İcon'un genişliğini belirleyin */
+    height: 128px; /* İcon'un yüksekliğini belirleyin */
+    z-index: 1000; /* Diğer elementlerin üzerinde görünmesini sağlamak için */
+    cursor: pointer;
+}

@@ -247,7 +247,9 @@ class DefaultHttpService : Service() {
                         try {
 
                             //BU SERVİSTE TÜM DOSYALAR DefaultServerWeb KLASÖRÜ İÇERİSİNDE OLACAĞI İÇİN KLASÖR İSMİNİ BAŞA EKLİYORUZ
-                            requestPath = "DefaultServerWeb/" + requestPath
+                            if(!requestPath.contains("../"))
+                                requestPath = "DefaultServerWeb/" + requestPath
+
                             Log.i(TAG, "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath)
 
                             val contentType = getContentType(File(requestPath))

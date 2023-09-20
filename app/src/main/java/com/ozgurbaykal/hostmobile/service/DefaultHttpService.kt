@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.Environment
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -16,7 +15,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.google.gson.Gson
 import com.ozgurbaykal.hostmobile.R
-import com.ozgurbaykal.hostmobile.control.CustomServerController
 import com.ozgurbaykal.hostmobile.control.SharedPreferenceManager
 import com.ozgurbaykal.hostmobile.model.AppDatabase
 import com.ozgurbaykal.hostmobile.model.CustomServerFolders
@@ -65,6 +63,7 @@ import com.ozgurbaykal.hostmobile.control.DefaultServerSharedPreferenceManager
 import com.ozgurbaykal.hostmobile.view.MainActivity
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
+import io.ktor.server.routing.delete
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -496,6 +495,7 @@ class DefaultHttpService : Service() {
                 }
             }
 
+            //SHAREDPREFENCE API STRING WRITE-READ
             authenticate ("auth-jwt"){
                 //ROUTE CODE 04
                 post ("/sharedpreference/write/string"){
@@ -555,6 +555,151 @@ class DefaultHttpService : Service() {
 
             }
 
+            //SHAREDPREFENCE API INTEGER WRITE-READ
+            authenticate ("auth-jwt"){
+                //ROUTE CODE 06
+                post ("/sharedpreference/write/int"){
+
+                    try {
+                        val requestData = call.receive<PreferenceDataInteger>()
+                        Log.i(TAG, "key: ${requestData.key} , integerValue: ${requestData.integerValue}")
+
+                        DefaultServerSharedPreferenceManager.writeInteger(requestData.key, requestData.integerValue)
+
+                        call.respond(HttpStatusCode.OK, "SharedPreference saved.")
+                    }catch (e: Exception) {
+                        Log.e(TAG, "/sharedpreference/write/int ERROR-> " + e.message)
+                        when(e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(61001, "Deserialization error. Check the format of your request data.")
+                                )
+                            }
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(61002, "Internal server error. Please try again later.")
+                                )
+                            }
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(61003, "Something unexpected happened on the server.")
+                                )
+                            }
+                        }
+                    }
+                }
+
+                //ROUTE CODE 07
+                get ("/sharedpreference/read/int"){
+
+                    val key = call.parameters["key"]
+                    val defaultIntegerValue = call.parameters["defaultIntegerValue"]
+
+                    if (key != null && defaultIntegerValue != null) {
+                        Log.i(TAG, "KEY: $key")
+
+                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readInteger(key, defaultIntegerValue.toInt()).toString())
+
+                    } else {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(71001, "Please send all parameters. key -> Your data key.  ---  defaultIntegerValue -> If data is null return default value.")
+                        )
+                    }
+                }
+
+            }
+
+            //SHAREDPREFENCE API BOOLEAN WRITE-READ
+            authenticate ("auth-jwt"){
+                //ROUTE CODE 06
+                post ("/sharedpreference/write/boolean"){
+
+                    try {
+                        val requestData = call.receive<PreferenceDataBoolean>()
+                        Log.i(TAG, "key: ${requestData.key} , booleanValue: ${requestData.booleanValue}")
+
+                        DefaultServerSharedPreferenceManager.writeBoolean(requestData.key, requestData.booleanValue)
+
+                        call.respond(HttpStatusCode.OK, "SharedPreference saved.")
+                    }catch (e: Exception) {
+                        Log.e(TAG, "/sharedpreference/write/boolean ERROR-> " + e.message)
+                        when(e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(61001, "Deserialization error. Check the format of your request data.")
+                                )
+                            }
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(61002, "Internal server error. Please try again later.")
+                                )
+                            }
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(61003, "Something unexpected happened on the server.")
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+
+                //ROUTE CODE 07
+                get ("/sharedpreference/read/boolean"){
+
+                    val key = call.parameters["key"]
+                    val defaultBooleanValue = call.parameters["defaultBooleanValue"]
+
+                    if (key != null && defaultBooleanValue != null) {
+                        Log.i(TAG, "KEY: $key")
+
+                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readBoolean(key, defaultBooleanValue.toBoolean()).toString())
+
+                    } else {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(71001, "Please send all parameters. key -> Your data key.  ---  defaultBooleanValue -> If data is null return default value.")
+                        )
+                    }
+                }
+
+            }
+
+
+            //SHAREDPREFENCE API REMOVE DATA
+            authenticate ("auth-jwt") {
+                //ROUTE CODE 08
+                delete("/sharedpreference/remove") {
+                    val key = call.parameters["key"]
+                    Log.i(TAG, " key: $key")
+                    if (key != null) {
+
+                        DefaultServerSharedPreferenceManager.remove(key)
+
+                        call.respond(HttpStatusCode.OK, "SharedPreference removed.")
+                    } else {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(81001, "Please send all parameters. key -> Your data key.")
+                        )
+                    }
+
+                }
+            }
 
         }
         Log.i(TAG, "server() ->")
@@ -600,4 +745,9 @@ class DefaultHttpService : Service() {
     @Serializable
     data class PreferenceDataString(val key: String, val stringValue: String)
 
+    @Serializable
+    data class PreferenceDataInteger(val key: String, val integerValue: Int)
+
+    @Serializable
+    data class PreferenceDataBoolean(val key: String, val booleanValue: Boolean)
 }

@@ -17,7 +17,7 @@
         android:id="@+id/simpleDialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Folder And Starter Html Page"
+        android:text="@string/select_folder_and_page"
         android:textAlignment="center"
         android:textSize="25sp"
         android:textColor="@color/white"
@@ -27,7 +27,7 @@
         android:id="@+id/simpleDialogParagraph"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Here you have to choose which folder it should process when the custom server starts and the start page that the custom server should use."
+        android:text="@string/select_folder_and_page_explain"
         android:textAlignment="center"/>
 
     <ExpandableListView
@@ -45,7 +45,7 @@
         android:layout_height="60dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="15dp"
-        android:text="Confirm"
+        android:text="@string/confirm"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:textColor="@color/white"

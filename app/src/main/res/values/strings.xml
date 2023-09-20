@@ -5,4 +5,67 @@
     <string name="lorem_ipsum_5word">Lorem ipsum dolor sit amet.</string>
     <string name="lorem_ipsum_1paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae egestas odio. Nulla odio orci, dapibus id urna a, mattis varius diam. Morbi lobortis vehicula hendrerit. Cras in aliquam est. Quisque non massa sodales, scelerisque turpis vel, efficitur diam. Sed non tristique lectus, a commodo arcu. Morbi mollis tincidunt sem id pharetra.</string>
 
+    <string name="tutorial_page_1_title">Welcome to HostMobile!</string>
+    <string name="tutorial_page_1_text">With this application you can create a server where you can host your own web files.</string>
+
+    <string name="tutorial_page_2_title">Documentation Before You Start</string>
+    <string name="tutorial_page_2_text">The tutorial is not intended for end users, but for software developers. Therefore we recommend you to check the documentation before starting.</string>
+
+    <string name="lets_go">Lets Go!</string>
+    <string name="go_to_docs">Go to Docs</string>
+    <string name="next">Next</string>
+
+    <string name="open_server_lets_go">OPEN SERVER(S) LETS GOOOOOOO!</string>
+    <string name="custom_server">Custom Server</string>
+    <string name="default_server">Default Server</string>
+    <string name="logs">Logs</string>
+    <string name="settings">Settings</string>
+
+    <string name="custom_server_conf">Custom Server Configuration</string>
+    <string name="local_ip">Local IP</string>
+    <string name="Port">Port</string>
+    <string name="auth_explain">Auth Password For Connection</string>
+    <string name="advanced_settings">Advanced Settings </string>
+    <string name="upload_folder">Upload Folder</string>
+    <string name="folder_copy_progress">Folder copying in progress... Please Wait</string>
+    <string name="selected_folder">Selected folder is </string>
+    <string name="none">NONE</string>
+    <string name="selected_starter_page">Selected starter page is </string>
+    <string name="none_html">NONE.html</string>
+    <string name="click_to_change">Click here to change</string>
+    <string name="close_auth">Close Authentication</string>
+    <string name="open_auth">Open Authentication</string>
+
+    <string name="default_server_conf">Default Server Configuration</string>
+
+    <string name="clear_log">CLEAR LOG</string>
+    <string name="cs_ds_explain">CS -> CustomServer     DS -> DefaultServer</string>
+    <string name="nothing_to_see">Nothing to see</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="select_folder_and_page">Select Folder And Starter Html Page</string>
+    <string name="select_folder_and_page_explain">Here you have to choose which folder it should process when the custom server starts and the start page that the custom server should use.</string>
+    <string name="confirm">Confirm</string>
+
+    <string name="already_copied">This folder name already copied. Please try different folder or change folder name.</string>
+    <string name="error">Error!</string>
+    <string name="warning">Warning!</string>
+    <string name="no_folders_found">No folders found. Please upload a folder and try again.!</string>
+    <string name="copy_folder_problem">There was a problem copying the folder, please try again.</string>
+    <string name="cant_edit_message">You cant edit folder and files for now, because custom server is running. Please stop server and try again.</string>
+    <string name="when_option_active">When this option is active, it asks for a 4-digit password when trying to connect to the custom server from any browser. After the user enters this password correctly, user is directed to the selected home page.</string>
+    <string name="about_authentication">About Authentication!</string>
+    <string name="no_selected_file_found">No selected file found. Please select file in advanced settings.</string>
+    <string name="empty_fields">Empty Fields!</string>
+    <string name="port_conflict">Port Conflict!</string>
+    <string name="port_field_empty">Custom Server Port field is empty. Please enter the port value and try again.</string>
+    <string name="port_conflict_message">The selected custom server %1$d port is currently in use by another application. Please select a different port and try again.</string>
+
+
+
+
+
+
 </resources>

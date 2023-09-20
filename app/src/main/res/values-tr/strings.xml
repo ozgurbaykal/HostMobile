@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">HostMobile</string>
+
+    <string name="lorem_ipsum_10word">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam porta.</string>
+    <string name="lorem_ipsum_5word">Lorem ipsum dolor sit amet.</string>
+    <string name="lorem_ipsum_1paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae egestas odio. Nulla odio orci, dapibus id urna a, mattis varius diam. Morbi lobortis vehicula hendrerit. Cras in aliquam est. Quisque non massa sodales, scelerisque turpis vel, efficitur diam. Sed non tristique lectus, a commodo arcu. Morbi mollis tincidunt sem id pharetra.</string>
+
+    <string name="tutorial_page_1_title">HostMobile\'e Hoş Geldiniz!</string>
+    <string name="tutorial_page_1_text">Bu uygulama ile kendi web dosyalarınızı barındırabileceğiniz bir sunucu oluşturabilirsiniz.</string>
+
+    <string name="tutorial_page_2_title">Başlamadan Önce Dökümantasyon</string>
+    <string name="tutorial_page_2_text">Uygulama son kullanıcıya yönelik değil, yazılım geliştiricilerine özeldir. Bu yüzden başlamadan önce dökümantasyona göz atmanızı tavsiye ederiz.</string>
+
+    <string name="lets_go">Hadi başlayalım!</string>
+    <string name="go_to_docs">Dokümanlara Git</string>
+    <string name="next">İleri</string>
+
+    <string name="open_server_lets_go">SUNUCULARI AÇ LETS GOOOOOOO!</string>
+    <string name="custom_server">Özel Sunucu</string>
+    <string name="default_server">Varsayılan Sunucu</string>
+    <string name="logs">Loglar</string>
+    <string name="settings">Ayarlar</string>
+
+    <string name="custom_server_conf">Özel Sunucu Yapılandırması</string>
+    <string name="local_ip">Yerel IP</string>
+    <string name="Port">Port</string>
+    <string name="auth_explain">Bağlantı İçin Giriş Şifresi</string>
+    <string name="advanced_settings">Gelişmiş Ayarlar </string>
+    <string name="upload_folder">Klasör Yükle</string>
+    <string name="folder_copy_progress">Klasör kopyalama işlemi devam ediyor… Lütfen Bekleyin</string>
+    <string name="selected_folder">Seçilen klasör  </string>
+    <string name="none">  NONE</string>
+    <string name="selected_starter_page">Seçilen başlangıç sayfası  </string>
+    <string name="none_html">  NONE.html</string>
+    <string name="click_to_change">Değiştirmek için buraya tıklayın</string>
+    <string name="close_auth">Kimlik Doğrulamayı Kapat</string>
+    <string name="open_auth">Kimlik Doğrulamayı Aç</string>
+
+    <string name="default_server_conf">Varsayılan Sunucu Yapılandırması</string>
+
+    <string name="clear_log">LOGLARI TEMİZLE</string>
+    <string name="cs_ds_explain">CS -> CustomServer     DS -> DefaultServer</string>
+    <string name="nothing_to_see">Görecek bir şey yok</string>
+
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
+
+    <string name="select_folder_and_page">Klasör ve Başlangıç Html Sayfası Seçin</string>
+    <string name="select_folder_and_page_explain">Burada özel sunucu başladığında hangi klasörün işleneceğini ve özel sunucunun kullanacağı başlangıç sayfasını seçmeniz gerekir.</string>
+    <string name="confirm">Onayla</string>
+
+    <string name="already_copied">Bu klasör adı zaten kopyalandı. Lütfen farklı bir klasör deneyin veya klasör adını değiştirin.</string>
+    <string name="error">Hata!</string>
+    <string name="warning">Uyarı!</string>
+    <string name="no_folders_found">Klasör bulunamadı. Lütfen bir klasör yükleyin ve tekrar deneyin!</string>
+    <string name="copy_folder_problem">Klasörü kopyalarken bir sorun oluştu, lütfen tekrar deneyin.</string>
+    <string name="cant_edit_message">Özel sunucu çalıştığı için şimdilik klasör ve dosyaları düzenleyemezsiniz. Lütfen sunucuyu durdurun ve tekrar deneyin.</string>
+    <string name="when_option_active">Bu seçenek aktif olduğunda, herhangi bir tarayıcıdan özel sunucuya bağlanmaya çalışırken 4 haneli bir şifre sorar. Kullanıcı bu şifreyi doğru bir şekilde girdikten sonra, kullanıcı seçilen ana sayfaya yönlendirilir.</string>
+    <string name="about_authentication">Kimlik Doğrulama Hakkında!</string>
+    <string name="no_selected_file_found">Seçili dosya bulunamadı. Lütfen gelişmiş ayarlardan dosya seçin.</string>
+    <string name="empty_fields">Empty Fields!</string>
+    <string name="port_conflict">Port Çakışması!</string>
+    <string name="port_field_empty">Custom Server Port alanı boş. Lütfen port değerini girin ve tekrar deneyin.</string>
+    <string name="port_conflict_message">Seçili özel sunucu %1$d bağlantı noktası şu anda başka bir uygulama tarafından kullanılıyor. Lütfen farklı bir bağlantı noktası seçin ve tekrar deneyin.</string>
+</resources>

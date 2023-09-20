@@ -17,7 +17,7 @@
         app:cornerRadius="10dp"
         app:strokeColor="#FFFFFF"
         android:textColor="@color/white"
-        android:text="CLEAR LOG"/>
+        android:text="@string/clear_log"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@color/white"
-            android:text="Nothing to see"
+            android:text="@string/nothing_to_see"
             android:textSize="15sp"/>
 
     </ScrollView>

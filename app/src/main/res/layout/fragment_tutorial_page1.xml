@@ -26,7 +26,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="80dp"
             android:layout_marginEnd="0dp"
-            android:text="@string/lorem_ipsum_5word"
+            android:text="@string/tutorial_page_1_title"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18dp" />
@@ -41,7 +41,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="0dp"
-            android:text="@string/lorem_ipsum_10word"
+            android:text="@string/tutorial_page_1_text"
             android:textAlignment="center"
             android:textColor="@color/custom_gray"
             android:textSize="18dp" />
@@ -61,6 +61,6 @@
             app:cornerRadius="10dp"
             app:strokeColor="#FFFFFF"
             android:textColor="@color/white"
-            android:text="NEXT"/>
+            android:text="@string/next"/>
 
 </RelativeLayout>

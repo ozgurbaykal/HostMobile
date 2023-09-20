@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
 import com.ozgurbaykal.hostmobile.R
@@ -102,8 +103,8 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
             } catch (e: SQLiteConstraintException) {
                 // when folderName already selected
                 MainActivity.getInstance()?.runOnUiThread {
-                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, "Error!","This folder name already copied. Please try different folder or change folder name.", R.drawable.warning)
-                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, context.getString(R.string.error),context.getString(R.string.already_copied), R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText(context.getString(R.string.confirm))
 
                     customDialogManager.showCustomDialog()
 
@@ -120,8 +121,8 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
 
             if(folderNames.isEmpty()){
                 MainActivity.getInstance()?.runOnUiThread {
-                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No folders found. Please upload a folder and try again.", R.drawable.warning)
-                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, context.getString(R.string.warning),context.getString(R.string.no_folders_found), R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText(context.getString(R.string.confirm))
 
                     customDialogManager.showCustomDialog()
                 }
@@ -209,8 +210,8 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
                 } else {
                     Log.e(TAG, "Folder cant copy: ${destFile.absolutePath}")
 
-                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, "Error!","There was a problem copying the folder, please try again.", R.drawable.warning)
-                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.SIMPLE_DIALOG, context.getString(R.string.error),context.getString(R.string.copy_folder_problem), R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText(context.getString(R.string.confirm))
 
                     customDialogManager.showCustomDialog()
 

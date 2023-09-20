@@ -4,20 +4,20 @@
         android:id="@+id/page_1_bottom_nav_button"
         android:enabled="true"
         android:icon="@drawable/custom_edit_server_icon"
-        android:title="Custom Server"/>
+        android:title="@string/custom_server"/>
     <item
         android:id="@+id/page_2_bottom_nav_button"
         android:enabled="true"
         android:icon="@drawable/installed_server_icon"
-        android:title="Default Server"/>
+        android:title="@string/default_server"/>
     <item
         android:id="@+id/page_3_bottom_nav_button"
         android:enabled="true"
         android:icon="@drawable/log_icon"
-        android:title="Logs"/>
+        android:title="@string/logs"/>
     <item
         android:id="@+id/page_4_bottom_nav_button"
         android:enabled="true"
         android:icon="@drawable/setting_icon"
-        android:title="Settings"/>
+        android:title="@string/settings"/>
 </menu>

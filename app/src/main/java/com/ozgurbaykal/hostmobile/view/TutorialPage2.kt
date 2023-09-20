@@ -22,6 +22,7 @@ class TutorialPage2 : Fragment(R.layout.fragment_tutorial_page2) {
     private val binding get() = _binding!!
 
     private lateinit var nextPageButton : Button
+    private lateinit var goToDocButton : Button
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,10 +44,16 @@ class TutorialPage2 : Fragment(R.layout.fragment_tutorial_page2) {
         val view = binding.root
 
         nextPageButton = binding.nextPageTutorial2
+        goToDocButton = binding.goToDocumentation
 
         nextPageButton.setOnClickListener {
             Log.i(TAG, "nextPageButton CLICKED")
             activity?.finish()
+
+        }
+
+        goToDocButton.setOnClickListener {
+            Log.i(TAG, "goToDocButton CLICKED")
 
         }
 

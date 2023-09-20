@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Default Server Configuration"
+                android:text="@string/default_server_conf"
                 android:textColor="@color/custom_gray"
                 android:textAlignment="center"
                 android:layout_marginBottom="15dp"
@@ -31,7 +31,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Local IP"
+                android:text="@string/local_ip"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp"/>
 
@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Port"
+                android:text="@string/Port"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp"
                 android:layout_marginTop="15dp"/>
@@ -74,7 +74,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Auth Password For Connection"
+                    android:text="@string/auth_explain"
                     android:textColor="@color/custom_gray"
                     android:textSize="19dp"/>
 
@@ -145,7 +145,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:text="Advanced Settings "
+                android:text="@string/advanced_settings"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp" />
 

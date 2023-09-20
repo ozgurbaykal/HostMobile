@@ -103,15 +103,15 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
 
                     withContext(Dispatchers.Main) {
                         if (folderNames.isEmpty()) {
-                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Warning!", "No folders found. Please upload a folder and try again.", R.drawable.warning)
-                            customDialogManager.setSimpleDialogButtonText("Confirm")
+                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, getString(R.string.warning), getString(R.string.no_folders_found), R.drawable.warning)
+                            customDialogManager.setSimpleDialogButtonText(getString(R.string.confirm))
                             customDialogManager.showCustomDialog()
                             return@withContext
                         }else{
                             if (selectedFolder != null) {
                                 if(selectedFolder.selectedFile == null){
-                                    val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No selected file found. Please select file in advanced settings.", R.drawable.warning)
-                                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                                    val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, getString(R.string.warning),getString(R.string.no_selected_file_found), R.drawable.warning)
+                                    customDialogManager.setSimpleDialogButtonText(getString(R.string.confirm))
 
                                     customDialogManager.showCustomDialog()
                                 }else{
@@ -122,15 +122,15 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                                         Log.i(TAG, "openServerButton clicked customServerPort: " + CustomServerController.customServerPort)
 
                                         if (CustomServerController.customServerPort == 0) {
-                                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Empty Fields", "Custom Server Port field is empty. Please enter the port value and try again.", R.drawable.empty)
-                                            customDialogManager.setSimpleDialogButtonText("Confirm")
+                                            val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, getString(R.string.empty_fields), getString(R.string.port_field_empty), R.drawable.empty)
+                                            customDialogManager.setSimpleDialogButtonText(getString(R.string.confirm))
                                             customDialogManager.showCustomDialog()
                                             return@withContext
                                         } else {
                                             if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
                                                 Log.e(TAG, "CustomServerPort is already used")
-                                                val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, "Port Conflict", "The selected custom server ${CustomServerController.customServerPort} port is currently in use by another application. Please select a different port and try again.", R.drawable.conflict)
-                                                customDialogManager.setSimpleDialogButtonText("Confirm")
+                                                val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, getString(R.string.port_conflict), getString(R.string.port_conflict_message, CustomServerController.customServerPort), R.drawable.conflict)
+                                                customDialogManager.setSimpleDialogButtonText(getString(R.string.confirm))
                                                 customDialogManager.showCustomDialog()
                                                 return@withContext
                                             }

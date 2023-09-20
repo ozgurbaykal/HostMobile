@@ -154,8 +154,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
             val isCustomServerRunning = ServiceUtils.isServiceRunning(requireContext(), CustomHttpService::class.java)
 
             if(isCustomServerRunning){
-                val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "Warning!","You cant edit folder and files for now, because custom server is running. Please stop server and try again.", R.drawable.warning)
-                customDialogManager.setSimpleDialogButtonText("Confirm")
+                val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, requireContext().getString(R.string.warning),requireContext().getString(R.string.cant_edit_message), R.drawable.warning)
+                customDialogManager.setSimpleDialogButtonText(requireContext().getString(R.string.confirm))
 
                 customDialogManager.showCustomDialog()
             }else{
@@ -195,8 +195,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
         }
 
         authInfo.setOnClickListener {
-            val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "About Authentication","When this option is active, it asks for a 4-digit password when trying to connect to the custom server from any browser. After the user enters this password correctly, user is directed to the selected home page.", R.drawable.info)
-            customDialogManager.setSimpleDialogButtonText("Confirm")
+            val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, requireContext().getString(R.string.about_authentication),requireContext().getString(R.string.when_option_active), R.drawable.info)
+            customDialogManager.setSimpleDialogButtonText(requireContext().getString(R.string.confirm))
 
             customDialogManager.showCustomDialog()
         }
@@ -322,8 +322,8 @@ class CustomServerFragment : Fragment(R.layout.fragment_custom_server) {
 
             if(folderNames.isEmpty()){
                 MainActivity.getInstance()?.runOnUiThread {
-                    val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, "Warning!","No folders found. Please upload a folder and try again.", R.drawable.warning)
-                    customDialogManager.setSimpleDialogButtonText("Confirm")
+                    val customDialogManager = CustomDialogManager(requireContext(), CustomDialogTypes.SIMPLE_DIALOG, requireContext().getString(R.string.warning),requireContext().getString(R.string.no_folders_found), R.drawable.warning)
+                    customDialogManager.setSimpleDialogButtonText(requireContext().getString(R.string.confirm))
 
                     customDialogManager.showCustomDialog()
                 }

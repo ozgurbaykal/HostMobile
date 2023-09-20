@@ -26,7 +26,7 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="80dp"
             android:layout_marginEnd="0dp"
-            android:text="@string/lorem_ipsum_5word"
+            android:text="@string/tutorial_page_2_title"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18dp" />
@@ -41,26 +41,48 @@
             android:layout_marginStart="0dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="0dp"
-            android:text="@string/lorem_ipsum_10word"
+            android:text="@string/tutorial_page_2_text"
             android:textAlignment="center"
             android:textColor="@color/custom_gray"
             android:textSize="18dp" />
 
-
-        <Button
-            android:id="@+id/nextPageTutorial2"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="52dp"
-            android:layout_marginEnd="0dp"
-            app:backgroundTint="@color/custom_red"
+            android:layout_height="wrap_content"
+                android:orientation="horizontal"
             android:layout_below="@+id/tutorialPage2Paragraph"
             android:layout_alignStart="@+id/tutorialPage2Paragraph"
-            android:layout_alignEnd="@+id/tutorialPage2Paragraph"
-            app:cornerRadius="10dp"
-            app:strokeColor="#FFFFFF"
-            android:textColor="@color/white"
-            android:text="Lets Go!"/>
+            android:layout_alignEnd="@+id/tutorialPage2Paragraph">
+
+                <Button
+                    android:id="@+id/goToDocumentation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="52dp"
+                    android:layout_marginEnd="10dp"
+                    app:backgroundTint="@color/custom_gray"
+                    app:cornerRadius="10dp"
+                    app:strokeColor="#FFFFFF"
+                    android:textColor="@color/white"
+                    android:text="@string/go_to_docs"/>
+
+                <Button
+                    android:id="@+id/nextPageTutorial2"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="52dp"
+                    android:layout_marginEnd="0dp"
+                    app:backgroundTint="@color/custom_red"
+                    app:cornerRadius="10dp"
+                    app:strokeColor="#FFFFFF"
+                    android:textColor="@color/white"
+                    android:text="@string/lets_go"/>
+
+        </LinearLayout>
+
+
+
 
 </RelativeLayout>

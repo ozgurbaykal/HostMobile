@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Custom Server Configuration"
+                android:text="@string/custom_server_conf"
                 android:textColor="@color/custom_gray"
                 android:textAlignment="center"
                 android:layout_marginBottom="15dp"
@@ -32,7 +32,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Local IP"
+                android:text="@string/local_ip"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp"/>
 
@@ -49,7 +49,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Port"
+                android:text="@string/Port"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp"
                 android:layout_marginTop="15dp"/>
@@ -58,7 +58,7 @@
                 android:id="@+id/customServerPortEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Port"
+                android:hint="@string/Port"
                 android:paddingBottom="20dp"
                 android:paddingStart="0dp"
                 android:inputType="number"
@@ -76,7 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Auth Password For Connection"
+                    android:text="@string/auth_explain"
                     android:textColor="@color/custom_gray"
                     android:textSize="19dp"/>
 
@@ -151,7 +151,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:text="Advanced Settings "
+                android:text="@string/advanced_settings"
                 android:textColor="@color/custom_gray"
                 android:textSize="19dp" />
 
@@ -184,7 +184,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload Folder"
+                        android:text="@string/upload_folder"
                         android:textColor="@color/white"
                         android:textSize="19dp" />
 
@@ -200,7 +200,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Folder copying in progress... Please Wait"
+                        android:text="@string/folder_copy_progress"
                         android:textColor="@color/custom_gray"
                         android:textSize="15dp"
                         android:layout_gravity="center"
@@ -240,7 +240,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Selected folder is "
+                            android:text="@string/selected_folder"
                             android:textColor="@color/white"
                             android:textSize="15dp" />
 
@@ -249,7 +249,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:text="NONE"
+                            android:text="@string/none"
                             android:textColor="@color/custom_red"
                             android:textSize="15dp" />
                     </LinearLayout>
@@ -262,7 +262,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Selected starter page is "
+                            android:text="@string/selected_starter_page"
                             android:textColor="@color/white"
                             android:textSize="15dp" />
 
@@ -271,7 +271,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:singleLine="true"
-                            android:text="NONE.html"
+                            android:text="@string/none_html"
                             android:textColor="@color/custom_red"
                             android:textSize="15dp" />
                     </LinearLayout>
@@ -280,7 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="Click here to change"
+                        android:text="@string/click_to_change"
                         android:textColor="@color/white"
                         android:textSize="11dp" />
 
@@ -318,7 +318,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Close Authentication"
+                    android:text="@string/close_auth"
                     android:background="@drawable/button_selected"
                     app:backgroundTint="@color/custom_red"
                     android:textColor="#FFFFFF"/>
@@ -334,7 +334,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/button_selected"
-                    android:text="Open Authentication"
+                    android:text="@string/open_auth"
                     app:backgroundTint="@android:color/transparent"
                     android:textColor="#FFFFFF"/>
                 </LinearLayout>

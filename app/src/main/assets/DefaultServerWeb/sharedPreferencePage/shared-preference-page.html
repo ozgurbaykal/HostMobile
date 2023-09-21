@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shared Preference Edit</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="shared-preference-style.css">
 </head>
 <body>
@@ -11,19 +12,65 @@
     <img src="hostmobile-icon-transparent.png" class="home-icon" alt="Main Page">
 </a>
 
-    <div class="title" >
-        <div class="grid-container">
-            <div class="grid-item">Write String</div>
-            <div class="grid-item">Write Integer</div>  
-            <div class="grid-item">Write Boolean</div>
-            <div class="grid-item">Remove Key</div>
-            <div class="grid-item">Read String</div>
-            <div class="grid-item">Read Integer</div>
-            <div class="grid-item">Read Boolean</div> 
-            <div class="grid-item">Remove All</div>
-          </div>
+<div class="title" >
+    <div class="grid-container">
+        <div class="grid-item" id="writeStringCard">Write String</div>
+        <div class="grid-item" id="writeIntegerCard">Write Integer</div>
+        <div class="grid-item" id="writeBooleanCard">Write Boolean</div>
+        <div class="grid-item" id="removeKeyCard">Remove Key</div>
+        <div class="grid-item" id="readStringCard">Read String</div>
+        <div class="grid-item" id="readIntegerCard">Read Integer</div>
+        <div class="grid-item" id="readBooleanCard">Read Boolean</div>
+        <div class="grid-item" id="removeAllCard">Remove All</div>
     </div>
-    
+</div>
+
+<!-- Write / Read Preference -->
+<div class="modal fade" id="preferenceModal" tabindex="-1" role="dialog" aria-labelledby="preferenceModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="sharedPrefInput1" style="color: aliceblue;" id="sharedPrefInput1Text">Text</label>
+                    <input type="text" class="form-control" id="sharedPrefInput1" placeholder="Enter Key" style="background-color: #1b1b1b;">
+                </div>
+                <div class="form-group">
+                    <label for="sharedPrefInput2" style="color: aliceblue;" id="sharedPrefInput2Text">Text</label>
+                    <input type="text" class="form-control" id="sharedPrefInput2" placeholder="Enter Value" style="background-color: #1b1b1b;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="sharedPrefSendButton">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Pref Modal -->
+<div class="modal fade" id="removePrefModal" tabindex="-1" role="dialog" aria-labelledby="preferenceModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="removePrefInput1" style="color: aliceblue;" id="removePrefInput1Text">The Key You Want To Remove</label>
+                    <input type="text" class="form-control" id="removePrefInput1" placeholder="Enter Key" style="background-color: #1b1b1b;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="removePrefSendButton">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script src="shared-preference-script.js"></script>
 </html>

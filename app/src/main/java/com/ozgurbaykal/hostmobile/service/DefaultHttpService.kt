@@ -109,6 +109,7 @@ class DefaultHttpService : Service() {
             .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))  // 1 saatlik süre.
             .sign(jwtAlgorithm)
     }
+
     fun sha256(value: String): String {
         val bytes = MessageDigest.getInstance("SHA-256").digest(value.toByteArray(Charsets.UTF_8))
         return bytes.joinToString("") { "%02x".format(it) }
@@ -139,6 +140,7 @@ class DefaultHttpService : Service() {
             methods += HttpMethod.Options
             methods += HttpMethod.Post
             methods += HttpMethod.Get
+            methods += HttpMethod.Delete
             headers += HttpHeaders.ContentType
             headers += HttpHeaders.AccessControlAllowOrigin
             headers += HttpHeaders.AccessControlAllowMethods
@@ -191,8 +193,18 @@ class DefaultHttpService : Service() {
 
                 //EĞER TOKEN NULL İSE (YANİ İLK GİRİŞ V.S.) GİRİŞ SAYFASINI GÖSTER
                 if (cookieToken == null) {
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is null in the request to the server. Redirect to home page. ", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   JWT token is null in the request to the server. Redirect to home page. ",
+                        ContextCompat.getColor(applicationContext, R.color.custom_red),
+                        false
+                    )
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   Request ->  $requestPath", Color.WHITE, false
+                    )
 
                     val fileExtension = requestPath.substringAfterLast('.', "").toLowerCase()
                     Log.i(TAG, "fileExtension:  $fileExtension")
@@ -210,7 +222,8 @@ class DefaultHttpService : Service() {
                             Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
 
                             val contentType = getContentType(File(requestPath))
-                            val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
+                            val fileContent =
+                                applicationContext.assets.open(requestPath).use { it.readBytes() }
                             call.respondBytes(fileContent, contentType)
                             return@get
                         } catch (e: IOException) {
@@ -228,8 +241,18 @@ class DefaultHttpService : Service() {
                     //TOKEN DOĞRULAMASI YUKARIDA BAŞARILI OLURSA DEFAULT SERVER ANA SAYFASINI GÖSTER (API)
                     Log.i(TAG, "DEFAULT SERVER JWT TOKENİ DOĞRU")
 
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   JWT token is true.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   JWT token is true.",
+                        ContextCompat.getColor(applicationContext, R.color.custom_green),
+                        false
+                    )
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   Request ->  $requestPath", Color.WHITE, false
+                    )
 
                     val assetManager = applicationContext.assets
 
@@ -240,23 +263,42 @@ class DefaultHttpService : Service() {
                             assetManager.open("DefaultServerWeb/default-server-main.html")
                                 .use { it.readBytes() }
                         val token = makeToken()
-                        call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
+                        call.response.cookies.append(
+                            Cookie(
+                                "auth_token",
+                                token,
+                                path = "/",
+                                httpOnly = true,
+                                maxAge = 3600
+                            )
+                        ) // 1 saat
                         call.respondBytes(authContent, ContentType.Text.Html)
                         return@get
                     } else {
                         try {
 
                             //BU SERVİSTE TÜM DOSYALAR DefaultServerWeb KLASÖRÜ İÇERİSİNDE OLACAĞI İÇİN KLASÖR İSMİNİ BAŞA EKLİYORUZ
-                            if(!requestPath.contains("../"))
+                            if (!requestPath.contains("../"))
                                 requestPath = "DefaultServerWeb/" + requestPath
 
-                            Log.i(TAG, "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath)
+                            Log.i(
+                                TAG,
+                                "default-server-main.html için ELSE bloğuna girdi requestPath: " + requestPath
+                            )
 
                             val contentType = getContentType(File(requestPath))
 
                             val fileContent = assetManager.open(requestPath).use { it.readBytes() }
                             val token = makeToken()
-                            call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
+                            call.response.cookies.append(
+                                Cookie(
+                                    "auth_token",
+                                    token,
+                                    path = "/",
+                                    httpOnly = true,
+                                    maxAge = 3600
+                                )
+                            ) // 1 saat
                             call.respondBytes(fileContent, contentType)
                             return@get
                         } catch (e: IOException) {
@@ -268,8 +310,18 @@ class DefaultHttpService : Service() {
 
                 } catch (e: JWTVerificationException) {
 
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Can't verify JWT token, redirect to home page.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   Request ->  $requestPath", Color.WHITE, false)
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   Can't verify JWT token, redirect to home page.",
+                        ContextCompat.getColor(applicationContext, R.color.custom_red),
+                        false
+                    )
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   Request ->  $requestPath", Color.WHITE, false
+                    )
 
                     //TOKEN DOĞRULAMASI BAŞARILI OLMADIĞI TAKDİRDE, GİRİŞ SAYFASI GÖSTER
                     Log.e(TAG, "TOKEN VERİFİCATİON ERROR: ")
@@ -290,7 +342,8 @@ class DefaultHttpService : Service() {
                             Log.i(TAG, "COOKIE NULL REQUESTPATH: " + requestPath)
 
                             val contentType = getContentType(File(requestPath))
-                            val fileContent = applicationContext.assets.open(requestPath).use { it.readBytes() }
+                            val fileContent =
+                                applicationContext.assets.open(requestPath).use { it.readBytes() }
                             call.respondBytes(fileContent, contentType)
                             return@get
                         } catch (e: IOException) {
@@ -305,7 +358,11 @@ class DefaultHttpService : Service() {
             //ROUTE CODE 02
             authenticate("auth-jwt") {
                 post("/postWebFolders") {
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   POST WEB FOLDERS REQUEST", Color.WHITE, false)
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   POST WEB FOLDERS REQUEST", Color.WHITE, false
+                    )
 
                     try {
                         val multipart = call.receiveMultipart()
@@ -327,7 +384,16 @@ class DefaultHttpService : Service() {
                                             HttpStatusCode.BadRequest,
                                             ErrorResponse(21001, "folderName is missing")
                                         )
-                                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> folderName is missing in request", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                                        MainActivity.getInstance()?.addLogFromInstance(
+                                            "DS ${
+                                                MainActivity.getInstance()?.getCurrentTime()
+                                            }   /postWebFolders -> folderName is missing in request",
+                                            ContextCompat.getColor(
+                                                applicationContext,
+                                                R.color.custom_red
+                                            ),
+                                            false
+                                        )
                                         return@post
                                     }
 
@@ -355,7 +421,16 @@ class DefaultHttpService : Service() {
                                                 HttpStatusCode.InternalServerError,
                                                 ErrorResponse(21002, "Failed to create directory")
                                             )
-                                            MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Failed to create directory", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                                            MainActivity.getInstance()?.addLogFromInstance(
+                                                "DS ${
+                                                    MainActivity.getInstance()?.getCurrentTime()
+                                                }   /postWebFolders -> Failed to create directory",
+                                                ContextCompat.getColor(
+                                                    applicationContext,
+                                                    R.color.custom_red
+                                                ),
+                                                false
+                                            )
                                             return@post
                                         }
                                     }
@@ -384,7 +459,13 @@ class DefaultHttpService : Service() {
                                 HttpStatusCode.BadRequest,
                                 ErrorResponse(21001, "folderName is missing")
                             )
-                            MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> folderName is missing in request", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                            MainActivity.getInstance()?.addLogFromInstance(
+                                "DS ${
+                                    MainActivity.getInstance()?.getCurrentTime()
+                                }   /postWebFolders -> folderName is missing in request",
+                                ContextCompat.getColor(applicationContext, R.color.custom_red),
+                                false
+                            )
                             return@post
                         }
 
@@ -406,16 +487,36 @@ class DefaultHttpService : Service() {
 
                         Log.i(TAG, "/postWebFolders  call.respond Files uploaded successfully")
                         val token = makeToken()
-                        call.response.cookies.append(Cookie("auth_token", token, path = "/", httpOnly = true, maxAge = 3600)) // 1 saat
+                        call.response.cookies.append(
+                            Cookie(
+                                "auth_token",
+                                token,
+                                path = "/",
+                                httpOnly = true,
+                                maxAge = 3600
+                            )
+                        ) // 1 saat
                         call.respond(
                             HttpStatusCode.OK,
                             mapOf("message" to "Files uploaded successfully")
                         )
-                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Files retrieved successfully", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+                        MainActivity.getInstance()?.addLogFromInstance(
+                            "DS ${
+                                MainActivity.getInstance()?.getCurrentTime()
+                            }   /postWebFolders -> Files retrieved successfully",
+                            ContextCompat.getColor(applicationContext, R.color.custom_green),
+                            false
+                        )
 
                     } catch (e: Exception) {
                         Log.i(TAG, "/postWebFolders ERROR: ")
-                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postWebFolders -> Something happened", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                        MainActivity.getInstance()?.addLogFromInstance(
+                            "DS ${
+                                MainActivity.getInstance()?.getCurrentTime()
+                            }   /postWebFolders -> Something happened",
+                            ContextCompat.getColor(applicationContext, R.color.custom_red),
+                            false
+                        )
                         e.printStackTrace()
                         call.respond(
                             HttpStatusCode.BadRequest,
@@ -432,7 +533,11 @@ class DefaultHttpService : Service() {
                     val requestData = call.receiveText()
                     Log.i(TAG, "Received data in /postAuthPassword -> : $requestData")
 
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   POST AUTH PASSWORD REQUEST", Color.WHITE, false)
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   POST AUTH PASSWORD REQUEST", Color.WHITE, false
+                    )
 
                     // Gson ile JSON'dan haritaya dönüşüm yap
                     val data: Map<String, String> =
@@ -445,7 +550,13 @@ class DefaultHttpService : Service() {
                     if (clientPassword == serverPasswordEncrypted) {
                         // Şifre doğru
                         Log.i(TAG, "Şifre Doğru")
-                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> CORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+                        MainActivity.getInstance()?.addLogFromInstance(
+                            "DS ${
+                                MainActivity.getInstance()?.getCurrentTime()
+                            }   /postAuthPassword -> CORRECT PASSWORD",
+                            ContextCompat.getColor(applicationContext, R.color.custom_green),
+                            false
+                        )
                         val token = makeToken()
                         call.response.cookies.append(
                             Cookie(
@@ -460,7 +571,13 @@ class DefaultHttpService : Service() {
                     } else {
                         // Şifre yanlış
                         Log.i(TAG, "Şifre yanlış")
-                        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   /postAuthPassword -> INCORRECT PASSWORD", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+                        MainActivity.getInstance()?.addLogFromInstance(
+                            "DS ${
+                                MainActivity.getInstance()?.getCurrentTime()
+                            }   /postAuthPassword -> INCORRECT PASSWORD",
+                            ContextCompat.getColor(applicationContext, R.color.custom_red),
+                            false
+                        )
 
                         call.respond(ResponseDto(false))
                     }
@@ -475,20 +592,27 @@ class DefaultHttpService : Service() {
 
 
             //ROUTE CODE 03
-            authenticate ("auth-jwt"){
-                get ("/getCurrentFolderData"){
-                    MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()}   GET (/getCurrentFolderData) REQUEST", Color.WHITE, false)
+            authenticate("auth-jwt") {
+                get("/getCurrentFolderData") {
+                    MainActivity.getInstance()?.addLogFromInstance(
+                        "DS ${
+                            MainActivity.getInstance()?.getCurrentTime()
+                        }   GET (/getCurrentFolderData) REQUEST", Color.WHITE, false
+                    )
 
                     val database = AppDatabase.getDatabase(applicationContext)
                     val dao = database.folderDao()
                     val folderNames = dao.getSelectedFolder()
 
-                    if(folderNames != null){
+                    if (folderNames != null) {
                         call.respond(
                             HttpStatusCode.OK,
-                            mapOf("selected_folder" to folderNames.folderName, "selected_starter_page" to folderNames.selectedFile)
+                            mapOf(
+                                "selected_folder" to folderNames.folderName,
+                                "selected_starter_page" to folderNames.selectedFile
+                            )
                         )
-                    }else{
+                    } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
                             ErrorResponse(31001, "Can't find any selected folder and starter page.")
@@ -498,59 +622,85 @@ class DefaultHttpService : Service() {
             }
 
             //SHAREDPREFENCE API STRING WRITE-READ
-            authenticate ("auth-jwt"){
+            authenticate("auth-jwt") {
                 //ROUTE CODE 04
-                post ("/sharedpreference/write/string"){
+                post("/sharedpreference/write/string") {
 
                     try {
                         val requestData = call.receive<PreferenceDataString>()
-                        Log.i(TAG, "key: ${requestData.key} , stringValue: ${requestData.stringValue}")
+                        Log.i(TAG, "key: ${requestData.key} , value: ${requestData.value}")
 
-                        DefaultServerSharedPreferenceManager.writeString(requestData.key, requestData.stringValue)
+                        DefaultServerSharedPreferenceManager.writeString(
+                            requestData.key,
+                            requestData.value
+                        )
 
                         call.respond(HttpStatusCode.OK, "SharedPreference saved.")
-                    }catch (e: Exception) {
-                        when(e) {
+                    } catch (e: Exception) {
+                        when (e) {
                             is BadRequestException -> {
                                 // Deserializasyon hatası için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.BadRequest,
-                                    ErrorResponse(51001, "Deserialization error. Check the format of your request data.")
+                                    ErrorResponse(
+                                        41001,
+                                        "Deserialization error. Check the format of your request data."
+                                    )
                                 )
                             }
+
                             is IOException -> {
                                 // I/O hataları için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(51002, "Internal server error. Please try again later.")
+                                    ErrorResponse(
+                                        41002,
+                                        "Internal server error. Please try again later."
+                                    )
                                 )
                             }
+
                             else -> {
                                 // Genel hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(51003, "Something unexpected happened on the server.")
+                                    ErrorResponse(
+                                        41003,
+                                        "Something unexpected happened on the server."
+                                    )
                                 )
                             }
-                    }
+                        }
                     }
                 }
 
                 //ROUTE CODE 05
-                get ("/sharedpreference/read/string"){
+                get("/sharedpreference/read/string") {
 
                     val key = call.parameters["key"]
-                    val defaultStringValue = call.parameters["defaultStringValue"]
+                    val defaultStringValue = call.parameters["defaultValue"]
 
                     if (key != null && defaultStringValue != null) {
                         Log.i(TAG, "KEY: $key")
 
-                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readString(key, defaultStringValue).toString())
 
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(
+                                true,
+                                DefaultServerSharedPreferenceManager.readString(
+                                    key,
+                                    defaultStringValue
+                                ).toString()
+                            )
+                        )
                     } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ErrorResponse(51001, "Please send all parameters. key -> Your data key.  ---  defaultStringValue -> If data is null return default value.")
+                            ErrorResponse(
+                                51001,
+                                "Please send all parameters. key -> Your data key.  ---  defaultStringValue -> If data is null return default value."
+                            )
                         )
                     }
                 }
@@ -558,39 +708,53 @@ class DefaultHttpService : Service() {
             }
 
             //SHAREDPREFENCE API INTEGER WRITE-READ
-            authenticate ("auth-jwt"){
+            authenticate("auth-jwt") {
                 //ROUTE CODE 06
-                post ("/sharedpreference/write/int"){
+                post("/sharedpreference/write/int") {
 
                     try {
                         val requestData = call.receive<PreferenceDataInteger>()
-                        Log.i(TAG, "key: ${requestData.key} , integerValue: ${requestData.integerValue}")
+                        Log.i(TAG, "key: ${requestData.key} , value: ${requestData.value}")
 
-                        DefaultServerSharedPreferenceManager.writeInteger(requestData.key, requestData.integerValue)
+                        DefaultServerSharedPreferenceManager.writeInteger(
+                            requestData.key,
+                            requestData.value
+                        )
 
                         call.respond(HttpStatusCode.OK, "SharedPreference saved.")
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
                         Log.e(TAG, "/sharedpreference/write/int ERROR-> " + e.message)
-                        when(e) {
+                        when (e) {
                             is BadRequestException -> {
                                 // Deserializasyon hatası için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.BadRequest,
-                                    ErrorResponse(61001, "Deserialization error. Check the format of your request data.")
+                                    ErrorResponse(
+                                        61001,
+                                        "Deserialization error. Check the format of your request data."
+                                    )
                                 )
                             }
+
                             is IOException -> {
                                 // I/O hataları için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(61002, "Internal server error. Please try again later.")
+                                    ErrorResponse(
+                                        61002,
+                                        "Internal server error. Please try again later."
+                                    )
                                 )
                             }
+
                             else -> {
                                 // Genel hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(61003, "Something unexpected happened on the server.")
+                                    ErrorResponse(
+                                        61003,
+                                        "Something unexpected happened on the server."
+                                    )
                                 )
                             }
                         }
@@ -598,20 +762,31 @@ class DefaultHttpService : Service() {
                 }
 
                 //ROUTE CODE 07
-                get ("/sharedpreference/read/int"){
+                get("/sharedpreference/read/int") {
 
                     val key = call.parameters["key"]
-                    val defaultIntegerValue = call.parameters["defaultIntegerValue"]
+                    val defaultIntegerValue = call.parameters["defaultValue"]
 
                     if (key != null && defaultIntegerValue != null) {
                         Log.i(TAG, "KEY: $key")
 
-                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readInteger(key, defaultIntegerValue.toInt()).toString())
-
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(
+                                true,
+                                DefaultServerSharedPreferenceManager.readInteger(
+                                    key,
+                                    defaultIntegerValue.toInt()
+                                ).toString()
+                            )
+                        )
                     } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ErrorResponse(71001, "Please send all parameters. key -> Your data key.  ---  defaultIntegerValue -> If data is null return default value.")
+                            ErrorResponse(
+                                71001,
+                                "Please send all parameters. key -> Your data key.  ---  defaultIntegerValue -> If data is null return default value."
+                            )
                         )
                     }
                 }
@@ -619,39 +794,53 @@ class DefaultHttpService : Service() {
             }
 
             //SHAREDPREFENCE API BOOLEAN WRITE-READ
-            authenticate ("auth-jwt"){
-                //ROUTE CODE 06
-                post ("/sharedpreference/write/boolean"){
+            authenticate("auth-jwt") {
+                //ROUTE CODE 08
+                post("/sharedpreference/write/boolean") {
 
                     try {
                         val requestData = call.receive<PreferenceDataBoolean>()
-                        Log.i(TAG, "key: ${requestData.key} , booleanValue: ${requestData.booleanValue}")
+                        Log.i(TAG, "key: ${requestData.key} , value: ${requestData.value}")
 
-                        DefaultServerSharedPreferenceManager.writeBoolean(requestData.key, requestData.booleanValue)
+                        DefaultServerSharedPreferenceManager.writeBoolean(
+                            requestData.key,
+                            requestData.value
+                        )
 
                         call.respond(HttpStatusCode.OK, "SharedPreference saved.")
-                    }catch (e: Exception) {
+                    } catch (e: Exception) {
                         Log.e(TAG, "/sharedpreference/write/boolean ERROR-> " + e.message)
-                        when(e) {
+                        when (e) {
                             is BadRequestException -> {
                                 // Deserializasyon hatası için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.BadRequest,
-                                    ErrorResponse(61001, "Deserialization error. Check the format of your request data.")
+                                    ErrorResponse(
+                                        81001,
+                                        "Deserialization error. Check the format of your request data."
+                                    )
                                 )
                             }
+
                             is IOException -> {
                                 // I/O hataları için spesifik bir hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(61002, "Internal server error. Please try again later.")
+                                    ErrorResponse(
+                                        81002,
+                                        "Internal server error. Please try again later."
+                                    )
                                 )
                             }
+
                             else -> {
                                 // Genel hata mesajı
                                 call.respond(
                                     HttpStatusCode.InternalServerError,
-                                    ErrorResponse(61003, "Something unexpected happened on the server.")
+                                    ErrorResponse(
+                                        81003,
+                                        "Something unexpected happened on the server."
+                                    )
                                 )
                             }
                         }
@@ -659,22 +848,33 @@ class DefaultHttpService : Service() {
                 }
 
 
-
-                //ROUTE CODE 07
-                get ("/sharedpreference/read/boolean"){
+                //ROUTE CODE 09
+                get("/sharedpreference/read/boolean") {
 
                     val key = call.parameters["key"]
-                    val defaultBooleanValue = call.parameters["defaultBooleanValue"]
+                    val defaultBooleanValue = call.parameters["defaultValue"]
 
                     if (key != null && defaultBooleanValue != null) {
                         Log.i(TAG, "KEY: $key")
 
-                        call.respond(HttpStatusCode.OK, DefaultServerSharedPreferenceManager.readBoolean(key, defaultBooleanValue.toBoolean()).toString())
 
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(
+                                true,
+                                DefaultServerSharedPreferenceManager.readBoolean(
+                                    key,
+                                    defaultBooleanValue.toBoolean()
+                                ).toString()
+                            )
+                        )
                     } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ErrorResponse(71001, "Please send all parameters. key -> Your data key.  ---  defaultBooleanValue -> If data is null return default value.")
+                            ErrorResponse(
+                                91001,
+                                "Please send all parameters. key -> Your data key.  ---  defaultBooleanValue -> If data is null return default value."
+                            )
                         )
                     }
                 }
@@ -683,7 +883,7 @@ class DefaultHttpService : Service() {
 
 
             //SHAREDPREFENCE API REMOVE DATA
-            authenticate ("auth-jwt") {
+            authenticate("auth-jwt") {
                 //ROUTE CODE 08
                 delete("/sharedpreference/remove") {
                     val key = call.parameters["key"]
@@ -692,20 +892,40 @@ class DefaultHttpService : Service() {
 
                         DefaultServerSharedPreferenceManager.remove(key)
 
-                        call.respond(HttpStatusCode.OK, "SharedPreference removed.")
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(true, "SharedPreference removed.")
+                        )
                     } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ErrorResponse(81001, "Please send all parameters. key -> Your data key.")
+                            ErrorResponse(
+                                81001,
+                                "Please send all parameters. key -> Your data key."
+                            )
                         )
                     }
 
                 }
 
+                //ROUTE CODE 09
                 delete("/sharedpreference/remove/all") {
+                    try {
                         DefaultServerSharedPreferenceManager.removeAll()
 
-                        call.respond(HttpStatusCode.OK, "All SharedPreference removed.")
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(true, "All SharedPreference removed.")
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sharedpreference/remove/all -> error: " + e.message)
+
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            ErrorResponse(91001, "Internal Server Error")
+                        )
+                    }
+
                 }
             }
 
@@ -716,7 +936,13 @@ class DefaultHttpService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         server.start(wait = false)
         Log.i(TAG, "onStartCommand() -> ")
-        MainActivity.getInstance()?.addLogFromInstance("DS ${MainActivity.getInstance()?.getCurrentTime()} DefaultServer is started.", ContextCompat.getColor(applicationContext, R.color.custom_green), false)
+        MainActivity.getInstance()?.addLogFromInstance(
+            "DS ${
+                MainActivity.getInstance()?.getCurrentTime()
+            } DefaultServer is started.",
+            ContextCompat.getColor(applicationContext, R.color.custom_green),
+            false
+        )
 
         return super.onStartCommand(intent, flags, startId)
     }
@@ -729,7 +955,13 @@ class DefaultHttpService : Service() {
         notificationManager.cancel(2)
 
         Log.i(TAG, "onDestroy() ->")
-        MainActivity.getInstance()?.addLogFromInstance("CS ${MainActivity.getInstance()?.getCurrentTime()} Default is stopped.", ContextCompat.getColor(applicationContext, R.color.custom_red), false)
+        MainActivity.getInstance()?.addLogFromInstance(
+            "CS ${
+                MainActivity.getInstance()?.getCurrentTime()
+            } Default is stopped.",
+            ContextCompat.getColor(applicationContext, R.color.custom_red),
+            false
+        )
 
         super.onDestroy()
     }
@@ -749,13 +981,17 @@ class DefaultHttpService : Service() {
     }
 
     @Serializable
+    data class SuccessResponse(val success: Boolean, val message: String)
+
+    @Serializable
     data class ErrorResponse(val error_code: Int, val message: String)
-    @Serializable
-    data class PreferenceDataString(val key: String, val stringValue: String)
 
     @Serializable
-    data class PreferenceDataInteger(val key: String, val integerValue: Int)
+    data class PreferenceDataString(val key: String, val value: String)
 
     @Serializable
-    data class PreferenceDataBoolean(val key: String, val booleanValue: Boolean)
+    data class PreferenceDataInteger(val key: String, val value: Int)
+
+    @Serializable
+    data class PreferenceDataBoolean(val key: String, val value: Boolean)
 }

@@ -1,6 +1,8 @@
 package com.ozgurbaykal.hostmobile.view
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -54,7 +56,9 @@ class TutorialPage2 : Fragment(R.layout.fragment_tutorial_page2) {
 
         goToDocButton.setOnClickListener {
             Log.i(TAG, "goToDocButton CLICKED")
-
+            val openURL = Intent(Intent.ACTION_VIEW)
+            openURL.data = Uri.parse("https://hostmobile.baykal.me")
+            startActivity(openURL)
         }
 
         return view

@@ -8,8 +8,8 @@
     <string name="tutorial_page_1_title">HostMobile\'e Hoş Geldiniz!</string>
     <string name="tutorial_page_1_text">Bu uygulama ile kendi web dosyalarınızı barındırabileceğiniz bir sunucu oluşturabilirsiniz.</string>
 
-    <string name="tutorial_page_2_title">Başlamadan Önce Dökümantasyon</string>
-    <string name="tutorial_page_2_text">Uygulama son kullanıcıya yönelik değil, yazılım geliştiricilerine özeldir. Bu yüzden başlamadan önce dökümantasyona göz atmanızı tavsiye ederiz.</string>
+    <string name="tutorial_page_2_title">Başlamadan Önce Dokümantasyon</string>
+    <string name="tutorial_page_2_text">Uygulama son kullanıcıya yönelik değil, yazılım geliştiricilerine özeldir. Bu yüzden başlamadan önce dokümantasyona göz atmanızı tavsiye ederiz.</string>
 
     <string name="lets_go">Hadi başlayalım!</string>
     <string name="go_to_docs">Dokümanlara Git</string>
@@ -62,4 +62,10 @@
     <string name="port_conflict">Port Çakışması!</string>
     <string name="port_field_empty">Custom Server Port alanı boş. Lütfen port değerini girin ve tekrar deneyin.</string>
     <string name="port_conflict_message">Seçili özel sunucu %1$d bağlantı noktası şu anda başka bir uygulama tarafından kullanılıyor. Lütfen farklı bir bağlantı noktası seçin ve tekrar deneyin.</string>
+
+    <string name="nothing_to_see_for_now">Şimdilik görülebilecek pek bir şey yok. Yakında planlanan güncellemeler yapılacak.</string>
+    <string name="rate_app">Uygulamayı Oyla</string>
+    <string name="design_by">Bu uygulama Özgür Baykal tarafından geliştirilmiştir.</string>
+    <string name="cant_find_mail_app">Hiçbir mail uygulaması bulunamadı.</string>
+
 </resources>

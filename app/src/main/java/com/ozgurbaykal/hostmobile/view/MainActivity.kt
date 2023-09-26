@@ -221,6 +221,8 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                 }
                 R.id.page_4_bottom_nav_button -> {
                     Log.i(TAG, "Bottom Nav ClickEvent -> PAGE 4")
+                    changeFragment(SettingsFragment(), R.id.main_fragment_view, "SettingsFragmentTag")
+
                     return@setOnItemSelectedListener true
                 }
             }

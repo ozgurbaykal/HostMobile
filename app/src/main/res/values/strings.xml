@@ -64,6 +64,10 @@
     <string name="port_conflict_message">The selected custom server %1$d port is currently in use by another application. Please select a different port and try again.</string>
 
 
+    <string name="nothing_to_see_for_now">There\'s not much to see at the moment. Planned updates will be made soon.</string>
+    <string name="rate_app">Rate the App</string>
+    <string name="design_by">This app developed by Ozgur Baykal.</string>
+    <string name="cant_find_mail_app">Can\'t find any mail app.</string>
 
 
 

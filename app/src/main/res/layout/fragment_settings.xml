@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/custom_black2">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/settingsTextsLinear"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/goToDocsButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:singleLine="true"
+            android:text="@string/go_to_docs"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/custom_blue"
+            app:cornerRadius="10dp"
+            app:strokeColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/rateAppButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:singleLine="true"
+            android:text="@string/rate_app"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/custom_green"
+            app:cornerRadius="10dp"
+            app:strokeColor="#FFFFFF" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/settingsTextsLinear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="5dp"
+            android:text="@string/design_by"
+            android:textAlignment="center"
+            android:textColor="@color/custom_gray"
+            android:textSize="19sp" />
+
+        <TextView
+            android:id="@+id/mail_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="25dp"
+            android:text="ozgur_baykal@hotmail.com"
+            android:textAlignment="center"
+            android:textColor="@color/custom_blue"
+            android:textSize="19sp" />
+
+        <TextView
+            android:id="@+id/settings_bottom_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="15dp"
+            android:text="@string/nothing_to_see_for_now"
+            android:textAlignment="center"
+            android:textColor="@color/custom_gray"
+            android:textSize="19sp" />
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

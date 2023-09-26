@@ -169,23 +169,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
-                    android:textColor="@color/custom_gray"
-                    android:textSize="19sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
-                    android:textColor="@color/custom_gray"
-                    android:textSize="19sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/lorem_ipsum_5word"
+                    android:text="@string/nothing_to_see_for_now"
                     android:textColor="@color/custom_gray"
                     android:textSize="19sp" />
 

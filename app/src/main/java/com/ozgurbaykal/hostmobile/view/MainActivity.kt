@@ -4,9 +4,9 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
+import android.content.IntentSender.SendIntentException
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -15,12 +15,15 @@ import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import com.ozgurbaykal.hostmobile.R
 import com.ozgurbaykal.hostmobile.control.CustomLocalAddress
 import com.ozgurbaykal.hostmobile.control.CustomServerController
@@ -42,8 +45,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 
@@ -246,6 +247,28 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
 
 
             instance = this
+
+
+            //CODE THAT COMPARES THE VERSION OF THE APPLICATION WITH THE GOOGLE PLAY VERSION
+            val appUpdateManager = AppUpdateManagerFactory.create(
+                applicationContext
+            )
+            appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo: AppUpdateInfo ->
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                ) {
+                    try {
+                        appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            AppUpdateType.IMMEDIATE,
+                            this, // RUN ON THIS ACTIVITY
+                            142536 //MY INTENT CODE
+                        )
+                    } catch (e: SendIntentException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
 
         }
 

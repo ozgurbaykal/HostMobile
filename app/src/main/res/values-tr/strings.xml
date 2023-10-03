@@ -68,4 +68,8 @@
     <string name="design_by">Bu uygulama Özgür Baykal tarafından geliştirilmiştir.</string>
     <string name="cant_find_mail_app">Hiçbir mail uygulaması bulunamadı.</string>
 
+    <string name="select_html">HTML Seç</string>
+    <string name="success">Başarılı!</string>
+    <string name="copy_success_message">%1$s adlı klasör Özel Sunucunun özel klasörüne başarıyla kopyalandı. \n\nBu klasör için başlangıç HTML sayfasını seçmek istiyor musunuz?</string>
+
 </resources>

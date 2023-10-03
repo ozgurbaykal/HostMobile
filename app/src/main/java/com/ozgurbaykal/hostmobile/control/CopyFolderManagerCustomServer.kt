@@ -82,8 +82,8 @@ class CopyFolderManagerCustomServer constructor(private val context: Context){
 
                     customDialogManager.showCustomDialog()*/
 
-                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.YES_OR_NO_DIALOG, "Success!","The folder named \"$selectedFolderName\" has been successfully copied to the custom folder of the Custom Server. \n\n Do you want to choose the starting HTML page for this folder?", R.drawable.check)
-                    customDialogManager.setYesNoDialogYesButtonText("Select HTML")
+                    val customDialogManager = CustomDialogManager(context, CustomDialogTypes.YES_OR_NO_DIALOG, context.getString(R.string.success),context.getString(R.string.copy_success_message, selectedFolderName), R.drawable.check)
+                    customDialogManager.setYesNoDialogYesButtonText(context.getString(R.string.select_html))
                     customDialogManager.setYesNoDialogNoButtonText("Later")
                     customDialogManager.showCustomDialog(
                         onDialogCancel = {

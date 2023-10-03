@@ -699,7 +699,7 @@ class DefaultHttpService : Service() {
                             HttpStatusCode.BadRequest,
                             ErrorResponse(
                                 51001,
-                                "Please send all parameters. key -> Your data key.  ---  defaultStringValue -> If data is null return default value."
+                                "Please send all parameters. key -> Your data key.  ---  defaultValue -> If data is null return default value."
                             )
                         )
                     }
@@ -785,7 +785,7 @@ class DefaultHttpService : Service() {
                             HttpStatusCode.BadRequest,
                             ErrorResponse(
                                 71001,
-                                "Please send all parameters. key -> Your data key.  ---  defaultIntegerValue -> If data is null return default value."
+                                "Please send all parameters. key -> Your data key.  ---  defaultValue -> If data is null return default value."
                             )
                         )
                     }

@@ -69,6 +69,9 @@
     <string name="design_by">This app developed by Ozgur Baykal.</string>
     <string name="cant_find_mail_app">Can\'t find any mail app.</string>
 
+    <string name="select_html">Select HTML</string>
+    <string name="success">Success!</string>
+    <string name="copy_success_message">The folder named %1$s has been successfully copied to the custom folder of the Custom Server. \n\nDo you want to choose the starting HTML page for this folder?</string>
 
 
 

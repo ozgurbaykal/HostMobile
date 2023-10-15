@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() , CustomServerFragment.AuthCodeProcessS
                                             return@withContext
                                         } else {
                                             if (!NetworkUtils.isPortAvailable(CustomServerController.customServerPort)) {
-                                                Log.e(TAG, "CustomServerPort is already used")
+                                                Log.e(TAG, "CustomServerPort is already used!!")
                                                 val customDialogManager = CustomDialogManager(this@MainActivity, CustomDialogTypes.SIMPLE_DIALOG, getString(R.string.port_conflict), getString(R.string.port_conflict_message, CustomServerController.customServerPort), R.drawable.conflict)
                                                 customDialogManager.setSimpleDialogButtonText(getString(R.string.confirm))
                                                 customDialogManager.showCustomDialog()

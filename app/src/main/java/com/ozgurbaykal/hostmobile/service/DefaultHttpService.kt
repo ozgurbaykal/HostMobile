@@ -59,6 +59,7 @@ import java.io.IOException
 import java.security.MessageDigest
 import java.util.Date
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.ozgurbaykal.hostmobile.control.DatabaseHelper
 import com.ozgurbaykal.hostmobile.control.DefaultServerSharedPreferenceManager
 import com.ozgurbaykal.hostmobile.view.MainActivity
 import io.ktor.server.plugins.BadRequestException
@@ -66,6 +67,8 @@ import io.ktor.server.request.receive
 import io.ktor.server.routing.delete
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 
 class DefaultHttpService : Service() {
 
@@ -908,7 +911,9 @@ class DefaultHttpService : Service() {
 
                 }
 
-                //ROUTE CODE 09
+
+
+                //ROUTE CODE 10
                 delete("/sharedpreference/remove/all") {
                     try {
                         DefaultServerSharedPreferenceManager.removeAll()
@@ -922,12 +927,403 @@ class DefaultHttpService : Service() {
 
                         call.respond(
                             HttpStatusCode.InternalServerError,
-                            ErrorResponse(91001, "Internal Server Error")
+                            ErrorResponse(101001, "Internal Server Error")
                         )
                     }
 
                 }
             }
+
+            //CREATE SQLITE DATABASE ROUTES
+            authenticate("auth-jwt") {
+                //ROUTE CODE 11
+                post("/sqlite/create/database") {
+
+                    try {
+                        val requestData = call.receive<DatabaseCreate>()
+                        Log.i(TAG, "database_name: ${requestData.database_name} ")
+
+                        try {
+                            val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+
+                            Log.i(TAG, "db name after create: ${dbHelper.databaseName}")
+
+                            call.respond(
+                                HttpStatusCode.OK,
+                                SuccessResponse(true, "The database named ${requestData.database_name} has been created.")
+                            )
+                        } catch (e: Exception) {
+                            // when create db something happend
+                            e.printStackTrace()
+                            call.respond(
+                                HttpStatusCode.InternalServerError,
+                                ErrorResponse(
+                                    111001,
+                                    "Something happened when try create database. SERVER MESSAGE: ${e.message}"
+                                )
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/create/database ERROR-> " + e.message)
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        111002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        111003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        111004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                //ROUTE CODE 12
+                get("/sqlite/is/database/exist") {
+
+                    val db_name = call.parameters["database_name"]
+
+                    if (db_name != null) {
+                        Log.i(TAG, "/sqlite/is/database/exist -> db_name: $db_name")
+
+                        val dbFile = applicationContext.getDatabasePath(db_name.toString().replace(" ", ""))
+
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponseBoolean(true, dbFile.exists())
+                        )
+                    } else {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(
+                                121001,
+                                "Please send all parameters. database_name -> Your database name."
+                            )
+                        )
+                    }
+                }
+            }
+
+
+
+            authenticate("auth-jwt") {
+                //ROUTE CODE 13
+                post("/sqlite/create/table") {
+
+                    try {
+                        val requestData = call.receive<TableCreate>()
+                        Log.i(TAG, "table_create_query: ${requestData.table_create_query} ")
+
+                        try {
+                            val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+
+                            dbHelper.createTable(requestData.table_create_query.toString())
+
+                            call.respond(
+                                HttpStatusCode.OK,
+                                SuccessResponse(true, "The table has been created.")
+                            )
+                        } catch (e: Exception) {
+                            // when create db something happend
+                            e.printStackTrace()
+                            call.respond(
+                                HttpStatusCode.InternalServerError,
+                                ErrorResponse(
+                                    131001,
+                                    "Something happened when try create database. SERVER MESSAGE: ${e.message}"
+                                )
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/create/table ERROR-> " + e.message)
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        131002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        131003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        131004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+                delete("/sqlite/delete/table") {
+                    //ROUTE CODE 14
+                    try {
+                        val requestData = call.receive<DropTable>()
+                        Log.i(TAG, "/sqlite/delete/table -> table_name: ${requestData.table_name} ")
+
+                        val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+                        dbHelper.dropTable(requestData.table_name.replace(" ", ""))
+
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponse(true, "The table named ${requestData.table_name.replace(" ", "")} has been deleted.")
+                        )
+
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/delete/table -> error: " + e.message)
+
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        141002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        141003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        141004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+
+                //ROUTE CODE 15
+                get("/sqlite/is/table/exist") {
+
+                    try {
+                        val requestData = call.receive<IsTableExist>()
+                        Log.i(TAG, "/sqlite/is/table/exist -> table_name: ${requestData.table_name} ")
+
+
+                        val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+                        val isTableExist = dbHelper.tableExists(dbHelper.readableDatabase, requestData.table_name)
+
+                        call.respond(
+                            HttpStatusCode.OK,
+                            SuccessResponseBoolean(true, isTableExist)
+                        )
+
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/is/table/exist -> error: " + e.message)
+
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        151002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        151003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        151004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+
+
+
+
+            }
+
+
+            authenticate ("auth-jwt"){
+
+                //ROUTE CODE 16
+                post("/sqlite/query") {
+
+                    try {
+                        val requestData = call.receive<QueryRequest>()
+
+                        val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+
+                        dbHelper.writableDatabase.execSQL(requestData.query)
+                        call.respond(HttpStatusCode.OK, SuccessResponse(true, "Query executed successfully"))
+
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/is/table/exist -> error: " + e.message)
+
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        161002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        161003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        161004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+
+
+                //ROUTE CODE 17
+                delete("/sqlite/delete/database") {
+
+                    try {
+                        val requestData = call.receive<DatabaseReset>()
+
+                        val dbHelper = DatabaseHelper(applicationContext, requestData.database_name.replace(" ", ""))
+                        dbHelper.deleteDatabase(requestData.database_name.replace(" ", ""))
+
+                        call.respond(HttpStatusCode.OK, SuccessResponse(true, "Database deleted successfully"))
+
+                    } catch (e: Exception) {
+                        Log.e(TAG, "/sqlite/delete/database -> error: " + e.message)
+
+                        when (e) {
+                            is BadRequestException -> {
+                                // Deserializasyon hatası için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    ErrorResponse(
+                                        171002,
+                                        "Deserialization error. Check the format of your request data. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            is IOException -> {
+                                // I/O hataları için spesifik bir hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        171003,
+                                        "Internal server error. Please try again later. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                // Genel hata mesajı
+                                call.respond(
+                                    HttpStatusCode.InternalServerError,
+                                    ErrorResponse(
+                                        171004,
+                                        "Something unexpected happened on the server. SERVER MESSAGE: ${e.message}"
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+
 
         }
         Log.i(TAG, "server() ->")
@@ -984,6 +1380,9 @@ class DefaultHttpService : Service() {
     data class SuccessResponse(val success: Boolean, val message: String)
 
     @Serializable
+    data class SuccessResponseBoolean(val success: Boolean, val message: Boolean)
+
+    @Serializable
     data class ErrorResponse(val error_code: Int, val message: String)
 
     @Serializable
@@ -994,4 +1393,25 @@ class DefaultHttpService : Service() {
 
     @Serializable
     data class PreferenceDataBoolean(val key: String, val value: Boolean)
+
+    @Serializable
+    data class DatabaseCreate(val database_name: String)
+
+    @Serializable
+    data class DatabaseReset(val database_name: String)
+    @Serializable
+    data class TableCreate(val database_name: String, val table_create_query: String)
+
+    @Serializable
+    data class DropTable(val database_name: String, val table_name: String)
+
+    @Serializable
+    data class IsTableExist(val database_name: String, val table_name: String)
+
+    @Serializable
+    data class QueryRequest(
+        val database_name: String,
+        val query: String
+    )
+
 }

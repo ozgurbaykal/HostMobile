@@ -934,7 +934,7 @@ class DefaultHttpService : Service() {
                 }
             }
 
-            //CREATE SQLITE DATABASE ROUTES
+            //CREATE-IS SQLITE DATABASE ROUTES
             authenticate("auth-jwt") {
                 //ROUTE CODE 11
                 post("/sqlite/create/database") {
@@ -1029,7 +1029,7 @@ class DefaultHttpService : Service() {
             }
 
 
-
+            //CREATE-DELETE-IS SQLITE TABLE ROUTES
             authenticate("auth-jwt") {
                 //ROUTE CODE 13
                 post("/sqlite/create/table") {
@@ -1097,6 +1097,7 @@ class DefaultHttpService : Service() {
                     }
                 }
 
+                //ROUTE CODE 14
                 delete("/sqlite/delete/table") {
                     //ROUTE CODE 14
                     try {
@@ -1216,7 +1217,7 @@ class DefaultHttpService : Service() {
 
             }
 
-
+            //DELETE DATABASE AND RUN QUERY ROUTES
             authenticate ("auth-jwt"){
 
                 //ROUTE CODE 16
